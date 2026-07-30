@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINE Bot - Dashboard</title>
+    <title>LINE Bot - Web App</title>
     <style>
-        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #0d1117;
             min-height: 100vh;
             display: flex;
@@ -22,18 +21,16 @@
             padding: 20px;
         }
 
-        /* ===== MAIN CONTAINER ===== */
         .app-container {
             width: 100%;
             max-width: 580px;
             background: #161b22;
             border-radius: 16px;
             border: 1px solid #30363d;
-            padding: 28px 28px 24px;
+            padding: 28px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
-        /* ===== HEADER ===== */
         .header {
             display: flex;
             justify-content: space-between;
@@ -57,7 +54,6 @@
             font-size: 20px;
             font-weight: 700;
             color: #f0f6fc;
-            letter-spacing: -0.5px;
         }
 
         .header-left h1 span {
@@ -89,11 +85,7 @@
             box-shadow: 0 0 8px rgba(63, 185, 80, 0.3);
         }
 
-        .status-dot.offline {
-            background: #f85149;
-        }
-
-        /* ===== CONFIG SECTION ===== */
+        /* Config Section */
         .config-section {
             background: #0d1117;
             border: 1px solid #30363d;
@@ -124,9 +116,8 @@
             border-radius: 8px;
             padding: 10px 14px;
             color: #f0f6fc;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
-            transition: border-color 0.2s;
         }
 
         .config-row input::placeholder {
@@ -148,7 +139,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
         }
 
         .config-row button:hover {
@@ -157,19 +147,13 @@
             color: #f0f6fc;
         }
 
-        /* ===== AI MODEL SELECTOR ===== */
+        /* Model Selector */
         .model-selector {
             display: flex;
             gap: 14px;
             align-items: center;
             flex-wrap: wrap;
             padding: 8px 0 4px;
-        }
-
-        .model-selector .group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .model-selector label {
@@ -193,11 +177,7 @@
             border-color: #58a6ff;
         }
 
-        .model-selector select option {
-            background: #161b22;
-        }
-
-        /* ===== CHAT AREA ===== */
+        /* Chat */
         .chat-area {
             background: #0d1117;
             border: 1px solid #30363d;
@@ -211,17 +191,11 @@
         .chat-area::-webkit-scrollbar {
             width: 5px;
         }
-
-        .chat-area::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
         .chat-area::-webkit-scrollbar-thumb {
             background: #30363d;
             border-radius: 10px;
         }
 
-        /* ===== MESSAGES ===== */
         .message {
             margin-bottom: 12px;
             display: flex;
@@ -248,7 +222,6 @@
             font-size: 14px;
             line-height: 1.5;
             word-wrap: break-word;
-            position: relative;
         }
 
         .message.sent .message-bubble {
@@ -270,10 +243,6 @@
             display: block;
         }
 
-        .message.received .message-bubble .time {
-            color: rgba(255, 255, 255, 0.25);
-        }
-
         .message-bubble .meta {
             font-size: 10px;
             color: rgba(255, 255, 255, 0.3);
@@ -281,7 +250,7 @@
             display: block;
         }
 
-        /* ===== TYPING ===== */
+        /* Typing */
         .typing-indicator {
             padding: 10px 14px;
             background: #21262d;
@@ -312,16 +281,11 @@
             30% { transform: translateY(-6px); opacity: 1; }
         }
 
-        /* ===== INPUT ===== */
-        .input-area {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        /* Input */
         .input-row {
             display: flex;
             gap: 10px;
+            margin-bottom: 10px;
         }
 
         .input-row input {
@@ -333,7 +297,6 @@
             color: #f0f6fc;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s;
         }
 
         .input-row input::placeholder {
@@ -355,7 +318,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
         }
 
         .input-row button:hover:not(:disabled) {
@@ -368,22 +330,20 @@
             cursor: not-allowed;
         }
 
-        /* ===== TOOLS BAR ===== */
+        /* Tools */
         .tools-bar {
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
-            padding-top: 4px;
         }
 
         .tools-bar button {
-            padding: 5px 14px;
+            padding: 6px 14px;
             background: transparent;
             border: 1px solid #30363d;
             border-radius: 6px;
             color: #8b949e;
             font-size: 11px;
-            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -404,7 +364,7 @@
             border-color: #3fb950;
         }
 
-        /* ===== TOAST ===== */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -422,7 +382,6 @@
             pointer-events: none;
             max-width: 90%;
             text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
         .toast.show {
@@ -440,7 +399,7 @@
             color: #3fb950;
         }
 
-        /* ===== MODAL ===== */
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -468,7 +427,6 @@
             width: 92%;
             max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         }
 
         .modal h3 {
@@ -476,7 +434,6 @@
             font-weight: 700;
             color: #f0f6fc;
             margin-bottom: 16px;
-            letter-spacing: -0.3px;
         }
 
         .modal textarea {
@@ -488,14 +445,13 @@
             border-radius: 10px;
             color: #f0f6fc;
             font-size: 14px;
-            font-family: 'SF Mono', 'Consolas', monospace;
+            font-family: monospace;
             resize: vertical;
             outline: none;
         }
 
         .modal textarea:focus {
             border-color: #58a6ff;
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
         }
 
         .modal-actions {
@@ -511,8 +467,8 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
             border: none;
+            transition: all 0.2s;
         }
 
         .modal-actions .btn-primary {
@@ -534,30 +490,12 @@
             color: #f0f6fc;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 500px) {
-            body { padding: 10px; }
             .app-container { padding: 16px; }
             .header-left h1 { font-size: 17px; }
-            .header-status { font-size: 10px; padding: 3px 10px; }
             .chat-area { height: 220px; }
             .input-row input { font-size: 13px; padding: 10px 14px; }
             .input-row button { padding: 10px 18px; font-size: 13px; }
-            .config-row input { font-size: 12px; }
-            .tools-bar button { font-size: 10px; padding: 4px 10px; }
-            .modal { padding: 20px; }
-        }
-
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0d1117;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #30363d;
-            border-radius: 10px;
         }
     </style>
 </head>
@@ -578,67 +516,60 @@
 
         <!-- CONFIG -->
         <div class="config-section">
-            <label>🔗 Web App Endpoint</label>
+            <label>🔗 Web App URL (/exec)</label>
             <div class="config-row">
                 <input type="text" id="webAppUrl" 
-                       placeholder="https://script.google.com/macros/s/.../exec">
+                       placeholder="https://script.google.com/macros/s/AKfycbxdXiV1F95c6d7uWz-3T7wqqiJK_EKjyMGHNyuJTv5umihRDz1Q0j7pPdnFcBUUCc0peA/exec"
+                       value="">
                 <button onclick="saveConfig()">Set</button>
             </div>
         </div>
 
         <!-- AI MODEL -->
         <div class="model-selector">
-            <div class="group">
-                <label>🤖 Model</label>
-                <select id="aiModelSelect">
-                    <option value="gemini-1.5-flash">Flash</option>
-                    <option value="gemini-1.5-pro">Pro</option>
-                    <option value="gemini-1.0-pro">1.0 Pro</option>
-                </select>
-            </div>
-            <div class="group">
-                <label>🌡️ Temp</label>
-                <select id="aiTempSelect">
-                    <option value="0.3">Cool</option>
-                    <option value="0.7" selected>Balanced</option>
-                    <option value="1.0">Creative</option>
-                </select>
-            </div>
-            <div class="group" style="margin-left:auto;">
-                <span id="aiStatus" style="font-size:12px;color:#8b949e;">AI: ⚡</span>
-            </div>
+            <label>🤖 Model</label>
+            <select id="aiModelSelect">
+                <option value="gemini-1.5-flash">⚡ Flash</option>
+                <option value="gemini-1.5-pro">💎 Pro</option>
+                <option value="gemini-1.0-pro">🔮 1.0 Pro</option>
+            </select>
+            <label style="margin-left:8px;">🌡️ Temp</label>
+            <select id="aiTempSelect">
+                <option value="0.3">❄️ Cool</option>
+                <option value="0.7" selected>🌤️ Balanced</option>
+                <option value="1.0">🔥 Creative</option>
+            </select>
         </div>
 
         <!-- CHAT -->
         <div class="chat-area" id="chatArea">
             <div class="message received">
                 <div class="message-bubble">
-                    Welcome!<br>
+                    👋 สวัสดี!<br>
                     <span style="font-size:12px;opacity:0.6;">
-                        Set your Web App URL to begin.
+                        ตั้งค่า Web App URL แล้วเริ่มใช้งาน
                     </span>
                 </div>
             </div>
         </div>
 
         <!-- INPUT -->
-        <div class="input-area">
-            <div class="input-row">
-                <input type="text" id="messageInput" 
-                       placeholder="Type your message..."
-                       onkeypress="if(event.key === 'Enter') sendMessage()">
-                <button id="sendBtn" onclick="sendMessage()">Send</button>
-            </div>
-            <div class="tools-bar">
-                <button onclick="sendWithAI()" class="ai-btn">🤖 AI Reply</button>
-                <button onclick="sendFlexMessage()">📊 Flex</button>
-                <button onclick="broadcastMessage()">📢 Broadcast</button>
-                <button onclick="getProfile()">👤 Profile</button>
-                <button onclick="getFollowers()">👥 Followers</button>
-                <button onclick="getQuota()">📊 Quota</button>
-                <button onclick="showFlexBuilder()">✏️ Builder</button>
-                <button onclick="clearChat()">🗑️ Clear</button>
-            </div>
+        <div class="input-row">
+            <input type="text" id="messageInput" 
+                   placeholder="พิมพ์ข้อความ..."
+                   onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button id="sendBtn" onclick="sendMessage()">ส่ง</button>
+        </div>
+
+        <div class="tools-bar">
+            <button onclick="sendWithAI()" class="ai-btn">🤖 AI Reply</button>
+            <button onclick="sendFlexMessage()">📊 Flex</button>
+            <button onclick="broadcastMessage()">📢 Broadcast</button>
+            <button onclick="getProfile()">👤 Profile</button>
+            <button onclick="getFollowers()">👥 Followers</button>
+            <button onclick="getQuota()">📊 Quota</button>
+            <button onclick="showFlexBuilder()">✏️ Builder</button>
+            <button onclick="clearChat()">🗑️ Clear</button>
         </div>
     </div>
 
@@ -674,7 +605,6 @@
         const webAppUrlInput = document.getElementById('webAppUrl');
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
-        const aiStatus = document.getElementById('aiStatus');
 
         // ===== STORAGE =====
         function loadConfig() {
@@ -689,10 +619,10 @@
             const url = webAppUrlInput.value.trim();
             if (url) {
                 localStorage.setItem('lineBotWebAppUrl', url);
-                showToast('✅ Endpoint saved', 'success');
+                showToast('✅ บันทึก URL แล้ว', 'success');
                 checkStatus();
             } else {
-                showToast('⚠️ Please enter a valid URL', 'error');
+                showToast('⚠️ กรุณาใส่ URL', 'error');
             }
         }
 
@@ -704,11 +634,11 @@
             return url;
         }
 
-        // ===== API CALL =====
+        // ===== CALL WEB APP =====
         async function callWebApp(action, payload = {}) {
             const url = getWebAppUrl();
             if (!url) {
-                throw new Error('⚠️ Please set Web App URL first');
+                throw new Error('⚠️ กรุณาตั้งค่า Web App URL ก่อน');
             }
 
             const response = await fetch(url, {
@@ -782,39 +712,41 @@
             if (typing) typing.remove();
         }
 
-        function setStatus(status, ai = null) {
+        function setStatus(status) {
             statusText.textContent = status;
             if (status === 'Online' || status === 'online') {
                 statusDot.className = 'status-dot online';
-            } else if (status === 'Offline' || status === 'offline') {
-                statusDot.className = 'status-dot offline';
             } else {
                 statusDot.className = 'status-dot';
-            }
-            if (ai) {
-                aiStatus.textContent = 'AI: ' + ai;
             }
         }
 
         // ===== SEND MESSAGE =====
         async function sendMessage() {
             const text = messageInput.value.trim();
-            if (!text) return;
+            if (!text) {
+                showToast('⚠️ กรุณาพิมพ์ข้อความ', 'error');
+                return;
+            }
 
             addMessage(text, 'sent');
             messageInput.value = '';
             sendBtn.disabled = true;
+            addTyping();
 
             try {
                 const data = await callWebApp('sendText', { message: text });
+                removeTyping();
+
                 if (data.success) {
-                    addMessage('✅ Sent', 'received', '📤');
-                    showToast('✅ Message sent', 'success');
+                    addMessage('✅ ส่งข้อความสำเร็จ!', 'received', '📤');
+                    showToast('✅ ส่งสำเร็จ', 'success');
                 } else {
-                    addMessage(`❌ ${data.error || 'Failed'}`, 'received');
-                    showToast('❌ Send failed', 'error');
+                    addMessage(`❌ ${data.error || 'ส่งไม่สำเร็จ'}`, 'received');
+                    showToast('❌ ส่งไม่สำเร็จ', 'error');
                 }
             } catch (error) {
+                removeTyping();
                 addMessage(`❌ ${error.message}`, 'received');
                 showToast('❌ Connection error', 'error');
             } finally {
@@ -826,14 +758,14 @@
         async function sendWithAI() {
             const text = messageInput.value.trim();
             if (!text) {
-                showToast('⚠️ Type a message first', 'error');
+                showToast('⚠️ กรุณาพิมพ์ข้อความ', 'error');
                 return;
             }
 
             const model = aiModelSelect.value;
             const modelName = AI_MODELS[model] || model;
 
-            addMessage(`🤖 Asking ${modelName}...`, 'sent');
+            addMessage(`🤖 กำลังถาม ${modelName}...`, 'sent');
             messageInput.value = '';
             addTyping();
 
@@ -846,10 +778,10 @@
 
                 if (data.success) {
                     addMessage(`🤖 ${data.aiResponse}`, 'received', `🧠 ${modelName}`);
-                    showToast('✅ AI replied', 'success');
+                    showToast('✅ AI ตอบแล้ว', 'success');
                 } else {
                     addMessage(`❌ AI Error: ${data.error}`, 'received');
-                    showToast('❌ AI failed', 'error');
+                    showToast('❌ AI ล้มเหลว', 'error');
                 }
             } catch (error) {
                 removeTyping();
@@ -860,7 +792,7 @@
 
         // ===== GET PROFILE =====
         async function getProfile() {
-            addMessage('👤 Fetching profile...', 'received');
+            addMessage('👤 กำลังดึงโปรไฟล์...', 'received');
             addTyping();
 
             try {
@@ -870,15 +802,15 @@
                 if (data.success && data.profile) {
                     const p = data.profile;
                     addMessage(`
-                        <strong>${p.displayName || 'N/A'}</strong><br>
-                        ID: ${p.userId || 'N/A'}<br>
-                        Language: ${p.language || 'N/A'}<br>
-                        Status: ${p.statusMessage || '—'}
-                        ${p.pictureUrl ? `<br><img src="${p.pictureUrl}" style="width:32px;border-radius:6px;margin-top:4px;">` : ''}
-                    `, 'received', '👤 Profile');
-                    showToast('✅ Profile loaded', 'success');
+                        👤 <strong>${p.displayName || 'N/A'}</strong><br>
+                        📱 ID: ${p.userId || 'N/A'}<br>
+                        🌐 ภาษา: ${p.language || 'N/A'}<br>
+                        💬 สถานะ: ${p.statusMessage || '—'}
+                        ${p.pictureUrl ? `<br><img src="${p.pictureUrl}" style="width:32px;border-radius:50%;margin-top:4px;">` : ''}
+                    `, 'received', '👤 โปรไฟล์');
+                    showToast('✅ โหลดโปรไฟล์สำเร็จ', 'success');
                 } else {
-                    addMessage(`❌ ${data.error || 'Unknown error'}`, 'received');
+                    addMessage(`❌ ${data.error || 'ไม่พบข้อมูล'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
@@ -889,7 +821,7 @@
 
         // ===== GET FOLLOWERS =====
         async function getFollowers() {
-            addMessage('👥 Fetching followers...', 'received');
+            addMessage('👥 กำลังดึงผู้ติดตาม...', 'received');
             addTyping();
 
             try {
@@ -900,14 +832,14 @@
                     const userIds = data.data.userIds || [];
                     const next = data.data.next || 'END';
                     addMessage(`
-                        <strong>${userIds.length}</strong> followers<br>
-                        Next: ${next}<br>
-                        ${userIds.slice(0, 5).map(id => `• ${id}`).join('<br>')}
-                        ${userIds.length > 5 ? `<br>• ... +${userIds.length - 5} more` : ''}
-                    `, 'received', '👥 Followers');
-                    showToast(`✅ ${userIds.length} followers`, 'success');
+                        📊 <strong>${userIds.length}</strong> คน<br>
+                        🔄 Next: ${next}<br>
+                        ${userIds.slice(0, 5).map(id => `📱 ${id}`).join('<br>')}
+                        ${userIds.length > 5 ? `<br>... +${userIds.length - 5} คน` : ''}
+                    `, 'received', '👥 ผู้ติดตาม');
+                    showToast(`✅ พบ ${userIds.length} คน`, 'success');
                 } else {
-                    addMessage(`❌ ${data.error || 'Unknown'}`, 'received');
+                    addMessage(`❌ ${data.error || 'ไม่พบข้อมูล'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
@@ -918,10 +850,10 @@
 
         // ===== BROADCAST =====
         async function broadcastMessage() {
-            const text = prompt('📢 Broadcast message:', 'Hello from LINE Bot!');
+            const text = prompt('📢 ข้อความ Broadcast:', 'Hello from LINE Bot!');
             if (!text) return;
 
-            addMessage(`📢 Broadcasting: "${text}"`, 'received');
+            addMessage(`📢 Broadcast: "${text}"`, 'received');
             addTyping();
 
             try {
@@ -929,11 +861,11 @@
                 removeTyping();
 
                 if (data.success) {
-                    addMessage('✅ Broadcast sent', 'received');
-                    showToast('✅ Broadcast sent', 'success');
+                    addMessage('✅ Broadcast สำเร็จ!', 'received');
+                    showToast('✅ Broadcast สำเร็จ', 'success');
                 } else {
                     addMessage(`❌ ${data.error}`, 'received');
-                    showToast('❌ Broadcast failed', 'error');
+                    showToast('❌ Broadcast ไม่สำเร็จ', 'error');
                 }
             } catch (error) {
                 removeTyping();
@@ -951,14 +883,14 @@
                     layout: 'vertical',
                     contents: [
                         { type: 'text', text: '📊 Flex Message', weight: 'bold', size: 'xl', color: '#58a6ff' },
-                        { type: 'text', text: 'From LINE Bot Dashboard', size: 'sm', color: '#8b949e', margin: 'md' },
+                        { type: 'text', text: 'จาก LINE Bot Dashboard', size: 'sm', color: '#8b949e', margin: 'md' },
                         { type: 'separator', margin: 'md' },
-                        { type: 'text', text: '✅ Ready!', size: 'sm', color: '#3fb950', margin: 'md' }
+                        { type: 'text', text: '✅ พร้อมใช้งาน!', size: 'sm', color: '#3fb950', margin: 'md' }
                     ]
                 }
             };
 
-            addMessage('📊 Sending Flex...', 'received');
+            addMessage('📊 กำลังส่ง Flex...', 'received');
             addTyping();
 
             try {
@@ -969,11 +901,11 @@
                 removeTyping();
 
                 if (data.success) {
-                    addMessage('✅ Flex sent', 'received');
+                    addMessage('✅ ส่ง Flex สำเร็จ!', 'received');
                     showToast('✅ Flex sent', 'success');
                 } else {
                     addMessage(`❌ ${data.error}`, 'received');
-                    showToast('❌ Flex failed', 'error');
+                    showToast('❌ Flex ไม่สำเร็จ', 'error');
                 }
             } catch (error) {
                 removeTyping();
@@ -984,7 +916,7 @@
 
         // ===== GET QUOTA =====
         async function getQuota() {
-            addMessage('📊 Checking quota...', 'received');
+            addMessage('📊 กำลังตรวจสอบ Quota...', 'received');
             addTyping();
 
             try {
@@ -995,14 +927,14 @@
                     const q = data.quota;
                     const remaining = (q.limit != null && q.used != null) ? q.limit - q.used : 'N/A';
                     addMessage(`
-                        <strong>Message Quota</strong><br>
-                        Limit: ${q.limit ?? 'N/A'}<br>
-                        Used: ${q.used ?? 'N/A'}<br>
-                        Remaining: ${remaining}
+                        📊 <strong>Message Quota</strong><br>
+                        📈 จำกัด: ${q.limit ?? 'N/A'}<br>
+                        📉 ใช้แล้ว: ${q.used ?? 'N/A'}<br>
+                        📊 เหลือ: ${remaining}
                     `, 'received', '📊 Quota');
-                    showToast('✅ Quota checked', 'success');
+                    showToast('✅ ตรวจสอบ Quota สำเร็จ', 'success');
                 } else {
-                    addMessage(`❌ ${data.error || 'Unknown'}`, 'received');
+                    addMessage(`❌ ${data.error || 'ไม่พบข้อมูล'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
@@ -1038,13 +970,13 @@
                 JSON.parse(jsonInput.value);
                 contentsStr = jsonInput.value;
             } catch (e) {
-                showToast('❌ Invalid JSON', 'error');
+                showToast('❌ JSON ไม่ถูกต้อง', 'error');
                 addMessage(`❌ JSON Error: ${e.message}`, 'received');
                 return;
             }
 
             closeFlexBuilder();
-            addMessage('📊 Sending custom Flex...', 'received');
+            addMessage('📊 กำลังส่ง Custom Flex...', 'received');
             addTyping();
 
             try {
@@ -1055,11 +987,11 @@
                 removeTyping();
 
                 if (data.success) {
-                    addMessage('✅ Custom Flex sent', 'received');
+                    addMessage('✅ ส่ง Custom Flex สำเร็จ!', 'received');
                     showToast('✅ Custom flex sent', 'success');
                 } else {
                     addMessage(`❌ ${data.error}`, 'received');
-                    showToast('❌ Send failed', 'error');
+                    showToast('❌ ส่งไม่สำเร็จ', 'error');
                 }
             } catch (error) {
                 removeTyping();
@@ -1073,12 +1005,12 @@
             chatArea.innerHTML = `
                 <div class="message received">
                     <div class="message-bubble">
-                        🗑️ Chat cleared<br>
-                        <span style="font-size:12px;opacity:0.6;">Ready</span>
+                        🗑️ ล้างแชทแล้ว<br>
+                        <span style="font-size:12px;opacity:0.6;">พร้อมใช้งาน</span>
                     </div>
                 </div>
             `;
-            showToast('🗑️ Chat cleared', 'info');
+            showToast('🗑️ ล้างแชทแล้ว');
         }
 
         // ===== CHECK STATUS =====
@@ -1086,7 +1018,7 @@
             try {
                 const data = await callWebApp('status', {});
                 if (data.status === 'online') {
-                    setStatus('Online', data.aiConfigured ? '⚡' : '—');
+                    setStatus('Online');
                 } else {
                     setStatus('Offline');
                 }
@@ -1108,7 +1040,7 @@
             }
         }, 2000);
 
-        // ===== KEYBOARD SHORTCUTS =====
+        // ===== SHORTCUT =====
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && e.ctrlKey) {
                 sendWithAI();
@@ -1116,9 +1048,10 @@
             }
         });
 
-        console.log('💬 LINE Bot Dashboard initialized');
+        console.log('💬 LINE Bot Web App Ready');
         console.log('⌨️ Ctrl+Enter = AI Reply');
-        console.log('🔗 Set your Web App URL above');
+        console.log('🔗 ตั้งค่า Web App URL ด้านบน');
     </script>
+
 </body>
 </html>
