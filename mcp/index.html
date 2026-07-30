@@ -1,8 +1,7 @@
-<!-- index.html (Google Apps Script HTML Service) -->
+<!-- index.html (standalone — host anywhere, calls a GAS Web App /exec URL) -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🤖 LINE Bot MCP - Web Interface</title>
@@ -433,6 +432,9 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // ★★★ ตั้งค่าตรงนี้: URL ของ GAS Web App ที่ Deploy แล้ว (ต้องลงท้ายด้วย /exec) ★★★
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxdXiV1F95c6d7uWz-3T7wqqiJK_EKjyMGHNyuJTv5umihRDz1Q0j7pPdnFcBUUCc0peA/exec';
+
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
@@ -485,14 +487,23 @@
             if (typing) typing.remove();
         }
 
-        // Wrap google.script.run in a Promise for async/await style
-        function runServer(functionName, ...args) {
-            return new Promise((resolve, reject) => {
-                google.script.run
-                    .withSuccessHandler(resolve)
-                    .withFailureHandler((err) => reject(new Error(err.message || String(err))))
-                    [functionName](...args);
+        /**
+         * เรียก GAS Web App /exec ด้วย action-based JSON
+         * ใช้ Content-Type: text/plain เพื่อเลี่ยง CORS preflight (OPTIONS)
+         * ที่ GAS Web App ไม่รองรับ
+         */
+        async function callGas(action, payload = {}) {
+            const response = await fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action, payload })
             });
+            const raw = await response.text();
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                throw new Error(`Server returned non-JSON (HTTP ${response.status}): ${raw.slice(0, 150)}`);
+            }
         }
         
         // API Calls
@@ -506,7 +517,7 @@
             addTyping();
             
             try {
-                const data = await runServer('sendTextMessage', text);
+                const data = await callGas('sendText', { message: text });
                 removeTyping();
                 
                 if (data.success) {
@@ -530,7 +541,7 @@
             addTyping();
             
             try {
-                const data = await runServer('getUserProfile');
+                const data = await callGas('getProfile');
                 removeTyping();
                 
                 if (data.success && data.profile) {
@@ -558,7 +569,7 @@
             addTyping();
             
             try {
-                const data = await runServer('getFollowerIds', 20);
+                const data = await callGas('getFollowers', { limit: 20 });
                 removeTyping();
                 
                 if (data.success && data.data) {
@@ -589,7 +600,7 @@
             addTyping();
             
             try {
-                const data = await runServer('broadcastMessage', text);
+                const data = await callGas('broadcast', { message: text });
                 removeTyping();
                 
                 if (data.success) {
@@ -628,7 +639,7 @@
             addTyping();
             
             try {
-                const data = await runServer('sendFlexMessageToUser', 'Flex Message from MCP', JSON.stringify(sampleFlex));
+                const data = await callGas('sendFlex', { altText: 'Flex Message from MCP', contents: sampleFlex });
                 removeTyping();
                 
                 if (data.success) {
@@ -650,7 +661,7 @@
             addTyping();
             
             try {
-                const data = await runServer('getMessageQuota');
+                const data = await callGas('getQuota');
                 removeTyping();
                 
                 if (data.success && data.quota) {
@@ -693,10 +704,9 @@
         
         async function sendCustomFlex() {
             const jsonInput = document.getElementById('flexJsonInput');
-            let contentsStr;
+            let contents;
             try {
-                JSON.parse(jsonInput.value); // validate
-                contentsStr = jsonInput.value;
+                contents = JSON.parse(jsonInput.value);
             } catch (e) {
                 showToast('❌ JSON ไม่ถูกต้อง', 'error');
                 addMessage(`❌ JSON Error: ${e.message}`, 'received');
@@ -708,7 +718,7 @@
             addTyping();
             
             try {
-                const data = await runServer('sendFlexMessageToUser', 'Custom Flex Message', contentsStr);
+                const data = await callGas('sendFlex', { altText: 'Custom Flex Message', contents });
                 removeTyping();
                 
                 if (data.success) {
@@ -740,7 +750,7 @@
         // Check server status
         async function checkStatus() {
             try {
-                const data = await runServer('checkStatus');
+                const data = await callGas('status');
                 document.getElementById('statusText').textContent = data.status === 'online' ? 'Online' : 'Offline';
                 if (!data.channelTokenConfigured) {
                     showToast('⚠️ Channel Token ไม่ได้ตั้งค่า', 'error');
@@ -753,7 +763,7 @@
         checkStatus();
         setInterval(checkStatus, 30000);
         
-        console.log('🤖 LINE Bot MCP Web Interface Ready (Apps Script mode)');
+        console.log('🤖 LINE Bot MCP Web Interface Ready (GAS /exec mode)');
     </script>
 </body>
 </html>
