@@ -1,1 +1,759 @@
+<!-- index.html (Google Apps Script HTML Service) -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 LINE Bot MCP - Web Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 95vh;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #06C755, #05a94a);
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .chat-area {
+            flex: 1;
+            padding: 16px 20px;
+            overflow-y: auto;
+            background: #f8faf8;
+        }
+        
+        .chat-area::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .chat-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .chat-area::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 10px;
+        }
+        
+        .message {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-end;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.sent {
+            justify-content: flex-end;
+        }
+        
+        .message.received {
+            justify-content: flex-start;
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .message.sent .message-bubble {
+            background: #06C755;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.received .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .message-meta {
+            font-size: 10px;
+            color: #999;
+            margin-top: 4px;
+            text-align: right;
+        }
+        
+        .message.received .message-meta {
+            text-align: left;
+        }
+        
+        .timestamp {
+            font-size: 10px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .typing-indicator {
+            padding: 10px 14px;
+            background: white;
+            border-radius: 18px;
+            display: inline-block;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.3;
+            }
+            30% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+        
+        .input-area {
+            padding: 12px 16px 16px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+            flex-shrink: 0;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .input-row input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .input-row input:focus {
+            border-color: #06C755;
+        }
+        
+        .input-row button {
+            padding: 10px 24px;
+            background: #06C755;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        
+        .input-row button:hover:not(:disabled) {
+            background: #05a94a;
+        }
+        
+        .input-row button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .tools-bar {
+            display: flex;
+            gap: 6px;
+            padding: 8px 0 0;
+            flex-wrap: wrap;
+        }
+        
+        .tools-bar button {
+            padding: 4px 12px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 15px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .tools-bar button:hover {
+            background: #06C755;
+            color: white;
+            border-color: #06C755;
+        }
+        
+        .tools-bar button.primary {
+            background: #06C755;
+            color: white;
+            border-color: #06C755;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal h3 {
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+        
+        .modal textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+        
+        .modal-actions button {
+            padding: 8px 20px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .modal-actions .btn-primary {
+            background: #06C755;
+            color: white;
+        }
+        
+        .modal-actions .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        @media (max-width: 480px) {
+            .app-container {
+                border-radius: 0;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🤖 LINE Bot</h1>
+            <div class="header-status">
+                <span class="status-dot"></span>
+                <span id="statusText">Online</span>
+            </div>
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message received">
+                <div class="message-bubble">
+                    👋 สวัสดี! ระบบพร้อมใช้งานแล้ว<br>
+                    <small style="color: #999;">สามารถพิมพ์ข้อความเพื่อส่ง หรือใช้เครื่องมือด้านล่าง</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <div class="input-row">
+                <input type="text" id="messageInput" placeholder="พิมพ์ข้อความ..." 
+                       onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button id="sendBtn" onclick="sendMessage()">ส่ง</button>
+            </div>
+            <div class="tools-bar">
+                <button onclick="sendFlexMessage()">📊 Flex</button>
+                <button onclick="broadcastMessage()">📢 Broadcast</button>
+                <button onclick="getProfile()">👤 Profile</button>
+                <button onclick="getFollowers()">👥 Followers</button>
+                <button onclick="getQuota()">📊 Quota</button>
+                <button onclick="showFlexBuilder()">✏️ Flex Builder</button>
+                <button onclick="clearChat()">🗑️ Clear</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Flex Builder Modal -->
+    <div class="modal-overlay" id="flexModal">
+        <div class="modal">
+            <h3>✏️ Flex Message Builder</h3>
+            <textarea id="flexJsonInput" placeholder='{"type":"bubble","body":{"type":"box","layout":"vertical","contents":[{"type":"text","text":"Hello!"}]}}'></textarea>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeFlexBuilder()">ยกเลิก</button>
+                <button class="btn-primary" onclick="sendCustomFlex()">ส่ง Flex</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        // Utility
+        function getTimestamp() {
+            return new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.background = type === 'error' ? '#dc2626' : '#1f2937';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+        
+        function addMessage(text, type = 'received', meta = '') {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerHTML = `
+                <div class="message-bubble">
+                    ${text}
+                    ${meta ? `<div class="message-meta">${meta}</div>` : ''}
+                    <div class="timestamp">${getTimestamp()}</div>
+                </div>
+            `;
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            return div;
+        }
+        
+        function addTyping() {
+            const div = document.createElement('div');
+            div.className = 'message received';
+            div.id = 'typingIndicator';
+            div.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        
+        function removeTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        // Wrap google.script.run in a Promise for async/await style
+        function runServer(functionName, ...args) {
+            return new Promise((resolve, reject) => {
+                google.script.run
+                    .withSuccessHandler(resolve)
+                    .withFailureHandler((err) => reject(new Error(err.message || String(err))))
+                    [functionName](...args);
+            });
+        }
+        
+        // API Calls
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+            
+            addMessage(text, 'sent');
+            messageInput.value = '';
+            sendBtn.disabled = true;
+            addTyping();
+            
+            try {
+                const data = await runServer('sendTextMessage', text);
+                removeTyping();
+                
+                if (data.success) {
+                    addMessage('✅ ส่งข้อความสำเร็จ!', 'received', `ส่งถึงผู้ใช้`);
+                    showToast('✅ ส่งข้อความสำเร็จ');
+                } else {
+                    addMessage(`❌ ${data.error || 'เกิดข้อผิดพลาด'}`, 'received');
+                    showToast('❌ ส่งข้อความไม่สำเร็จ', 'error');
+                }
+            } catch (error) {
+                removeTyping();
+                addMessage(`❌ Connection error: ${error.message}`, 'received');
+                showToast('❌ Connection error', 'error');
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+        
+        async function getProfile() {
+            addMessage('🔍 กำลังดึงข้อมูลโปรไฟล์...', 'received');
+            addTyping();
+            
+            try {
+                const data = await runServer('getUserProfile');
+                removeTyping();
+                
+                if (data.success && data.profile) {
+                    const p = data.profile;
+                    addMessage(`
+                        👤 <strong>${p.displayName || 'N/A'}</strong><br>
+                        📱 ID: ${p.userId || 'N/A'}<br>
+                        🌐 Language: ${p.language || 'N/A'}<br>
+                        💬 Status: ${p.statusMessage || 'No status'}<br>
+                        ${p.pictureUrl ? `<img src="${p.pictureUrl}" style="width:40px;border-radius:50%;margin-top:4px;">` : ''}
+                    `, 'received', '👤 Profile');
+                    showToast('✅ ดึงโปรไฟล์สำเร็จ');
+                } else {
+                    addMessage(`❌ ไม่สามารถดึงข้อมูล: ${data.error || 'Unknown error'}`, 'received');
+                }
+            } catch (error) {
+                removeTyping();
+                addMessage(`❌ Error: ${error.message}`, 'received');
+                showToast('❌ Error fetching profile', 'error');
+            }
+        }
+        
+        async function getFollowers() {
+            addMessage('👥 กำลังดึงรายชื่อผู้ติดตาม...', 'received');
+            addTyping();
+            
+            try {
+                const data = await runServer('getFollowerIds', 20);
+                removeTyping();
+                
+                if (data.success && data.data) {
+                    const userIds = data.data.userIds || [];
+                    const next = data.data.next || 'ไม่มีต่อ';
+                    addMessage(`
+                        📊 พบผู้ติดตาม <strong>${userIds.length}</strong> คน<br>
+                        🔄 Next token: ${next}<br>
+                        ${userIds.slice(0, 5).map(id => `📱 ${id}`).join('<br>')}
+                        ${userIds.length > 5 ? `<br>...และอีก ${userIds.length - 5} คน` : ''}
+                    `, 'received', '👥 Followers');
+                    showToast(`✅ พบ ${userIds.length} คน`);
+                } else {
+                    addMessage(`❌ ไม่พบข้อมูล: ${data.error || 'Unknown'}`, 'received');
+                }
+            } catch (error) {
+                removeTyping();
+                addMessage(`❌ Error: ${error.message}`, 'received');
+                showToast('❌ Error fetching followers', 'error');
+            }
+        }
+        
+        async function broadcastMessage() {
+            const text = prompt('📢 ข้อความที่ต้องการ Broadcast:', 'Hello from MCP!');
+            if (!text) return;
+            
+            addMessage(`📢 กำลัง Broadcast: "${text}"`, 'received');
+            addTyping();
+            
+            try {
+                const data = await runServer('broadcastMessage', text);
+                removeTyping();
+                
+                if (data.success) {
+                    addMessage('✅ Broadcast สำเร็จ!', 'received');
+                    showToast('✅ Broadcast สำเร็จ');
+                } else {
+                    addMessage(`❌ Error: ${data.error}`, 'received');
+                    showToast('❌ Broadcast ไม่สำเร็จ', 'error');
+                }
+            } catch (error) {
+                removeTyping();
+                addMessage(`❌ Error: ${error.message}`, 'received');
+                showToast('❌ Broadcast error', 'error');
+            }
+        }
+        
+        async function sendFlexMessage() {
+            const sampleFlex = {
+                type: 'bubble',
+                body: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        { type: 'text', text: '🎉 Flex Message!', weight: 'bold', size: 'xl', color: '#06C755' },
+                        { type: 'text', text: 'ส่งจาก MCP Web Interface', size: 'sm', color: '#666', margin: 'md' },
+                        { type: 'separator', margin: 'md' },
+                        { type: 'text', text: '✅ ทำงานสำเร็จ!', size: 'sm', color: '#333', margin: 'md' }
+                    ]
+                },
+                styles: {
+                    footer: { separator: true }
+                }
+            };
+            
+            addMessage('📊 กำลังส่ง Flex Message...', 'received');
+            addTyping();
+            
+            try {
+                const data = await runServer('sendFlexMessageToUser', 'Flex Message from MCP', JSON.stringify(sampleFlex));
+                removeTyping();
+                
+                if (data.success) {
+                    addMessage('✅ ส่ง Flex Message สำเร็จ!', 'received');
+                    showToast('✅ Flex message sent');
+                } else {
+                    addMessage(`❌ Error: ${data.error}`, 'received');
+                    showToast('❌ Flex send failed', 'error');
+                }
+            } catch (error) {
+                removeTyping();
+                addMessage(`❌ Error: ${error.message}`, 'received');
+                showToast('❌ Flex error', 'error');
+            }
+        }
+        
+        async function getQuota() {
+            addMessage('📊 กำลังตรวจสอบ Quota...', 'received');
+            addTyping();
+            
+            try {
+                const data = await runServer('getMessageQuota');
+                removeTyping();
+                
+                if (data.success && data.quota) {
+                    const q = data.quota;
+                    addMessage(`
+                        📊 <strong>Message Quota</strong><br>
+                        📈 Limit: ${q.limit ?? 'N/A'}<br>
+                        📉 Used: ${q.used ?? 'N/A'}<br>
+                        📊 Remaining: ${(q.limit != null && q.used != null) ? q.limit - q.used : 'N/A'}
+                    `, 'received', '📊 Quota');
+                    showToast('✅ Quota checked');
+                } else {
+                    addMessage(`❌ ${data.error || 'ไม่สามารถดึงข้อมูล'}`, 'received');
+                }
+            } catch (error) {
+                removeTyping();
+                addMessage(`❌ Error: ${error.message}`, 'received');
+                showToast('❌ Quota error', 'error');
+            }
+        }
+        
+        function showFlexBuilder() {
+            document.getElementById('flexModal').classList.add('show');
+            document.getElementById('flexJsonInput').value = JSON.stringify({
+                type: 'bubble',
+                body: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        { type: 'text', text: 'Hello!', weight: 'bold', size: 'xl' },
+                        { type: 'text', text: 'Flex message', size: 'sm', color: '#666' }
+                    ]
+                }
+            }, null, 2);
+        }
+        
+        function closeFlexBuilder() {
+            document.getElementById('flexModal').classList.remove('show');
+        }
+        
+        async function sendCustomFlex() {
+            const jsonInput = document.getElementById('flexJsonInput');
+            let contentsStr;
+            try {
+                JSON.parse(jsonInput.value); // validate
+                contentsStr = jsonInput.value;
+            } catch (e) {
+                showToast('❌ JSON ไม่ถูกต้อง', 'error');
+                addMessage(`❌ JSON Error: ${e.message}`, 'received');
+                return;
+            }
+            
+            closeFlexBuilder();
+            addMessage('📊 กำลังส่ง Flex Message...', 'received');
+            addTyping();
+            
+            try {
+                const data = await runServer('sendFlexMessageToUser', 'Custom Flex Message', contentsStr);
+                removeTyping();
+                
+                if (data.success) {
+                    addMessage('✅ ส่ง Flex Message สำเร็จ!', 'received');
+                    showToast('✅ Custom flex sent');
+                } else {
+                    addMessage(`❌ Error: ${data.error}`, 'received');
+                    showToast('❌ Send failed', 'error');
+                }
+            } catch (error) {
+                removeTyping();
+                addMessage(`❌ Error: ${error.message}`, 'received');
+                showToast('❌ Send error', 'error');
+            }
+        }
+        
+        function clearChat() {
+            chatArea.innerHTML = `
+                <div class="message received">
+                    <div class="message-bubble">
+                        💬 แชทถูกล้างแล้ว<br>
+                        <small style="color: #999;">พร้อมใช้งาน</small>
+                    </div>
+                </div>
+            `;
+            showToast('🗑️ ล้างแชทแล้ว');
+        }
+        
+        // Check server status
+        async function checkStatus() {
+            try {
+                const data = await runServer('checkStatus');
+                document.getElementById('statusText').textContent = data.status === 'online' ? 'Online' : 'Offline';
+                if (!data.channelTokenConfigured) {
+                    showToast('⚠️ Channel Token ไม่ได้ตั้งค่า', 'error');
+                }
+            } catch (e) {
+                document.getElementById('statusText').textContent = 'Offline';
+                showToast('⚠️ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+            }
+        }
+        checkStatus();
+        setInterval(checkStatus, 30000);
+        
+        console.log('🤖 LINE Bot MCP Web Interface Ready (Apps Script mode)');
+    </script>
+</body>
+</html>
