@@ -1,696 +1,472 @@
+<!-- index.html (standalone — host anywhere, calls a GAS Web App /exec URL) -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINE Bot - Dashboard</title>
+    <title>🤖 LINE Bot MCP - Web Interface</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0d1117;
-            min-height: 100vh;
+            background: #f0f2f5;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
-
+        
         .app-container {
             width: 100%;
-            max-width: 580px;
-            background: #161b22;
-            border-radius: 16px;
-            border: 1px solid #30363d;
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            max-width: 480px;
+            height: 95vh;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
         }
-
+        
         .header {
+            background: linear-gradient(135deg, #06C755, #05a94a);
+            color: white;
+            padding: 18px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #30363d;
-            margin-bottom: 16px;
+            flex-shrink: 0;
         }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-left .icon {
-            font-size: 24px;
-        }
-
-        .header-left h1 {
+        
+        .header h1 {
             font-size: 18px;
             font-weight: 700;
-            color: #f0f6fc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        .header-left h1 span {
-            color: #58a6ff;
-        }
-
+        
         .header-status {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            color: #8b949e;
-            background: #21262d;
+            gap: 8px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
             padding: 4px 12px;
             border-radius: 20px;
-            border: 1px solid #30363d;
         }
-
+        
         .status-dot {
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            display: inline-block;
-            background: #8b949e;
+            background: #4ade80;
+            animation: pulse 2s infinite;
         }
-
-        .status-dot.online {
-            background: #3fb950;
-            box-shadow: 0 0 8px rgba(63, 185, 80, 0.3);
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
-
-        .status-dot.offline {
-            background: #f85149;
-        }
-
-        /* Config */
-        .config-section {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 12px 14px;
-            margin-bottom: 14px;
-        }
-
-        .config-section label {
-            display: block;
-            font-size: 10px;
-            font-weight: 600;
-            color: #8b949e;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-
-        .config-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .config-row input {
-            flex: 1;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 8px 12px;
-            color: #f0f6fc;
-            font-size: 12px;
-            outline: none;
-        }
-
-        .config-row input:focus {
-            border-color: #58a6ff;
-        }
-
-        .config-row input::placeholder {
-            color: #484f58;
-        }
-
-        .config-row button {
-            padding: 8px 16px;
-            background: #21262d;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            color: #c9d1d9;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .config-row button:hover {
-            background: #30363d;
-            border-color: #58a6ff;
-            color: #f0f6fc;
-        }
-
-        /* Model Selector */
-        .model-selector {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            padding: 6px 0 2px;
-        }
-
-        .model-selector label {
-            font-size: 10px;
-            color: #8b949e;
-            font-weight: 500;
-        }
-
-        .model-selector select {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 5px;
-            padding: 4px 10px;
-            color: #f0f6fc;
-            font-size: 12px;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .model-selector select:focus {
-            border-color: #58a6ff;
-        }
-
-        /* Chat */
+        
         .chat-area {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 12px;
-            height: 280px;
+            flex: 1;
+            padding: 16px 20px;
             overflow-y: auto;
-            margin-bottom: 14px;
+            background: #f8faf8;
         }
-
+        
         .chat-area::-webkit-scrollbar {
             width: 4px;
         }
+        
+        .chat-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
         .chat-area::-webkit-scrollbar-thumb {
-            background: #30363d;
+            background: #ddd;
             border-radius: 10px;
         }
-
+        
         .message {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: flex;
-            animation: fadeIn 0.3s ease;
+            align-items: flex-end;
+            animation: slideIn 0.3s ease;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-
+        
         .message.sent {
             justify-content: flex-end;
         }
-
+        
         .message.received {
             justify-content: flex-start;
         }
-
+        
         .message-bubble {
             max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            line-height: 1.5;
+            padding: 10px 14px;
+            border-radius: 18px;
             word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-
+        
         .message.sent .message-bubble {
-            background: #1f6feb;
-            color: #f0f6fc;
-            border-bottom-right-radius: 3px;
+            background: #06C755;
+            color: white;
+            border-bottom-right-radius: 4px;
         }
-
+        
         .message.received .message-bubble {
-            background: #21262d;
-            color: #c9d1d9;
-            border-bottom-left-radius: 3px;
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e5e7eb;
         }
-
-        .message-bubble .time {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.4);
-            margin-top: 3px;
-            display: block;
+        
+        .message-meta {
+            font-size: 10px;
+            color: #999;
+            margin-top: 4px;
+            text-align: right;
         }
-
-        .message-bubble .meta {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.3);
+        
+        .message.received .message-meta {
+            text-align: left;
+        }
+        
+        .timestamp {
+            font-size: 10px;
+            color: #999;
             margin-top: 2px;
-            display: block;
         }
-
-        /* Typing */
+        
         .typing-indicator {
-            padding: 8px 12px;
-            background: #21262d;
-            border-radius: 10px;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 18px;
             display: inline-block;
-            border-bottom-left-radius: 3px;
+            border: 1px solid #e5e7eb;
         }
-
+        
         .typing-dots {
             display: flex;
             gap: 4px;
         }
-
+        
         .typing-dots span {
-            width: 6px;
-            height: 6px;
-            background: #8b949e;
+            width: 8px;
+            height: 8px;
+            background: #999;
             border-radius: 50%;
-            display: block;
-            animation: typingBounce 1.4s ease-in-out infinite;
+            animation: typing 1.4s infinite;
         }
-
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typingBounce {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
-            30% { transform: translateY(-5px); opacity: 1; }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
         }
-
-        /* Input */
+        
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.3;
+            }
+            30% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+        
+        .input-area {
+            padding: 12px 16px 16px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+            flex-shrink: 0;
+        }
+        
         .input-row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 10px;
+            align-items: center;
         }
-
+        
         .input-row input {
             flex: 1;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: #f0f6fc;
-            font-size: 13px;
+            padding: 10px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
             outline: none;
+            font-size: 14px;
+            transition: border-color 0.2s;
         }
-
+        
         .input-row input:focus {
-            border-color: #58a6ff;
+            border-color: #06C755;
         }
-
-        .input-row input::placeholder {
-            color: #484f58;
-        }
-
+        
         .input-row button {
-            padding: 10px 22px;
-            background: #1f6feb;
+            padding: 10px 24px;
+            background: #06C755;
+            color: white;
             border: none;
-            border-radius: 8px;
-            color: #f0f6fc;
-            font-size: 13px;
-            font-weight: 600;
+            border-radius: 25px;
             cursor: pointer;
-            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+            white-space: nowrap;
         }
-
+        
         .input-row button:hover:not(:disabled) {
-            background: #388bfd;
+            background: #05a94a;
         }
-
+        
         .input-row button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-
-        /* Tools */
+        
         .tools-bar {
             display: flex;
-            gap: 5px;
+            gap: 6px;
+            padding: 8px 0 0;
             flex-wrap: wrap;
         }
-
+        
         .tools-bar button {
-            padding: 5px 12px;
-            background: transparent;
-            border: 1px solid #30363d;
-            border-radius: 5px;
-            color: #8b949e;
-            font-size: 10px;
+            padding: 4px 12px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 15px;
+            font-size: 11px;
             cursor: pointer;
             transition: all 0.2s;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-
+        
         .tools-bar button:hover {
-            background: #21262d;
-            border-color: #58a6ff;
-            color: #f0f6fc;
+            background: #06C755;
+            color: white;
+            border-color: #06C755;
         }
-
-        .tools-bar button.ai-btn {
-            border-color: #3fb950;
-            color: #3fb950;
+        
+        .tools-bar button.primary {
+            background: #06C755;
+            color: white;
+            border-color: #06C755;
         }
-
-        .tools-bar button.ai-btn:hover {
-            background: rgba(63, 185, 80, 0.1);
-            border-color: #3fb950;
-        }
-
-        /* Toast */
+        
         .toast {
             position: fixed;
             bottom: 20px;
             left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: #21262d;
-            border: 1px solid #30363d;
-            border-radius: 8px;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
             padding: 10px 20px;
-            color: #f0f6fc;
+            border-radius: 12px;
             font-size: 13px;
             opacity: 0;
-            transition: all 0.4s ease;
+            transition: opacity 0.3s;
             z-index: 1000;
             pointer-events: none;
-            max-width: 90%;
-            text-align: center;
         }
-
+        
         .toast.show {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
         }
-
-        .toast.error {
-            border-color: #f85149;
-            color: #f85149;
-        }
-
-        .toast.success {
-            border-color: #3fb950;
-            color: #3fb950;
-        }
-
-        /* Modal */
+        
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0,0,0,0.5);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 2000;
-            backdrop-filter: blur(4px);
         }
-
+        
         .modal-overlay.show {
             display: flex;
         }
-
+        
         .modal {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
+            background: white;
+            border-radius: 20px;
             padding: 24px;
-            max-width: 480px;
-            width: 92%;
+            max-width: 400px;
+            width: 90%;
             max-height: 80vh;
             overflow-y: auto;
         }
-
+        
         .modal h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #f0f6fc;
-            margin-bottom: 14px;
+            margin-bottom: 16px;
+            color: #1f2937;
         }
-
+        
         .modal textarea {
             width: 100%;
-            min-height: 140px;
+            min-height: 150px;
             padding: 12px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            color: #f0f6fc;
-            font-size: 13px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
             font-family: monospace;
+            font-size: 13px;
             resize: vertical;
-            outline: none;
         }
-
-        .modal textarea:focus {
-            border-color: #58a6ff;
-        }
-
+        
         .modal-actions {
             display: flex;
             gap: 10px;
-            margin-top: 14px;
+            margin-top: 16px;
             justify-content: flex-end;
         }
-
+        
         .modal-actions button {
             padding: 8px 20px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
+            border-radius: 12px;
             border: none;
-            transition: all 0.2s;
+            cursor: pointer;
+            font-weight: 600;
         }
-
+        
         .modal-actions .btn-primary {
-            background: #1f6feb;
-            color: #f0f6fc;
+            background: #06C755;
+            color: white;
         }
-
-        .modal-actions .btn-primary:hover {
-            background: #388bfd;
-        }
-
+        
         .modal-actions .btn-secondary {
-            background: #21262d;
-            color: #8b949e;
+            background: #e5e7eb;
+            color: #374151;
         }
-
-        .modal-actions .btn-secondary:hover {
-            background: #30363d;
-            color: #f0f6fc;
-        }
-
-        @media (max-width: 500px) {
-            .app-container { padding: 16px; }
-            .header-left h1 { font-size: 16px; }
-            .chat-area { height: 220px; }
-            .input-row input { font-size: 12px; padding: 8px 12px; }
-            .input-row button { padding: 8px 16px; font-size: 12px; }
+        
+        @media (max-width: 480px) {
+            .app-container {
+                border-radius: 0;
+                height: 100vh;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="app-container">
-        <!-- HEADER -->
         <div class="header">
-            <div class="header-left">
-                <span class="icon">💬</span>
-                <h1>LINE <span>Bot</span></h1>
-            </div>
+            <h1>🤖 LINE Bot</h1>
             <div class="header-status">
-                <span class="status-dot" id="statusDot"></span>
-                <span id="statusText">Ready</span>
+                <span class="status-dot"></span>
+                <span id="statusText">Online</span>
             </div>
         </div>
-
-        <!-- CONFIG -->
-        <div class="config-section">
-            <label>🔗 Web App URL</label>
-            <div class="config-row">
-                <input type="text" id="webAppUrl" 
-                       placeholder="https://script.google.com/macros/s/.../exec">
-                <button onclick="saveConfig()">Set</button>
-            </div>
-        </div>
-
-        <!-- AI MODEL -->
-        <div class="model-selector">
-            <label>🤖 Model</label>
-            <select id="aiModelSelect">
-                <option value="gemini-1.5-flash">⚡ Flash</option>
-                <option value="gemini-1.5-pro">💎 Pro</option>
-                <option value="gemini-1.0-pro">🔮 1.0 Pro</option>
-            </select>
-            <label style="margin-left:8px;">🌡️</label>
-            <select id="aiTempSelect">
-                <option value="0.3">❄️ Cool</option>
-                <option value="0.7" selected>🌤️ Balanced</option>
-                <option value="1.0">🔥 Creative</option>
-            </select>
-        </div>
-
-        <!-- CHAT -->
+        
         <div class="chat-area" id="chatArea">
             <div class="message received">
                 <div class="message-bubble">
-                    👋 สวัสดี!<br>
-                    <span style="font-size:11px;opacity:0.6;">
-                        ตั้งค่า Web App URL แล้วเริ่มใช้งาน
-                    </span>
+                    👋 สวัสดี! ระบบพร้อมใช้งานแล้ว<br>
+                    <small style="color: #999;">สามารถพิมพ์ข้อความเพื่อส่ง หรือใช้เครื่องมือด้านล่าง</small>
                 </div>
             </div>
         </div>
-
-        <!-- INPUT -->
-        <div class="input-row">
-            <input type="text" id="messageInput" 
-                   placeholder="พิมพ์ข้อความ..."
-                   onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button id="sendBtn" onclick="sendMessage()">ส่ง</button>
-        </div>
-
-        <div class="tools-bar">
-            <button onclick="sendWithAI()" class="ai-btn">🤖 AI Reply</button>
-            <button onclick="sendFlexMessage()">📊 Flex</button>
-            <button onclick="broadcastMessage()">📢 Broadcast</button>
-            <button onclick="getProfile()">👤 Profile</button>
-            <button onclick="getFollowers()">👥 Followers</button>
-            <button onclick="getQuota()">📊 Quota</button>
-            <button onclick="showFlexBuilder()">✏️ Builder</button>
-            <button onclick="clearChat()">🗑️ Clear</button>
-        </div>
-    </div>
-
-    <!-- MODAL -->
-    <div class="modal-overlay" id="flexModal">
-        <div class="modal">
-            <h3>✏️ Flex Builder</h3>
-            <textarea id="flexJsonInput" placeholder='{"type":"bubble","body":{"type":"box","layout":"vertical","contents":[{"type":"text","text":"Hello!"}]}}'></textarea>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="closeFlexBuilder()">Cancel</button>
-                <button class="btn-primary" onclick="sendCustomFlex()">Send</button>
+        
+        <div class="input-area">
+            <div class="input-row">
+                <input type="text" id="messageInput" placeholder="พิมพ์ข้อความ..." 
+                       onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button id="sendBtn" onclick="sendMessage()">ส่ง</button>
+            </div>
+            <div class="tools-bar">
+                <button onclick="sendFlexMessage()">📊 Flex</button>
+                <button onclick="broadcastMessage()">📢 Broadcast</button>
+                <button onclick="getProfile()">👤 Profile</button>
+                <button onclick="getFollowers()">👥 Followers</button>
+                <button onclick="getQuota()">📊 Quota</button>
+                <button onclick="showFlexBuilder()">✏️ Flex Builder</button>
+                <button onclick="clearChat()">🗑️ Clear</button>
             </div>
         </div>
     </div>
 
-    <!-- TOAST -->
+    <!-- Flex Builder Modal -->
+    <div class="modal-overlay" id="flexModal">
+        <div class="modal">
+            <h3>✏️ Flex Message Builder</h3>
+            <textarea id="flexJsonInput" placeholder='{"type":"bubble","body":{"type":"box","layout":"vertical","contents":[{"type":"text","text":"Hello!"}]}}'></textarea>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeFlexBuilder()">ยกเลิก</button>
+                <button class="btn-primary" onclick="sendCustomFlex()">ส่ง Flex</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // ===== CONFIG =====
-        const AI_MODELS = {
-            'gemini-1.5-flash': '⚡ Flash',
-            'gemini-1.5-pro': '💎 Pro',
-            'gemini-1.0-pro': '🔮 1.0 Pro'
-        };
+        // ★★★ ตั้งค่าตรงนี้: URL ของ GAS Web App ที่ Deploy แล้ว (ต้องลงท้ายด้วย /exec) ★★★
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
-        // ===== DOM REFS =====
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
-        const aiModelSelect = document.getElementById('aiModelSelect');
-        const webAppUrlInput = document.getElementById('webAppUrl');
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-
-        // ===== STORAGE =====
-        function loadConfig() {
-            const saved = localStorage.getItem('lineBotWebAppUrl');
-            if (saved) {
-                webAppUrlInput.value = saved;
-                setTimeout(checkStatus, 1000);
-            }
-        }
-
-        function saveConfig() {
-            const url = webAppUrlInput.value.trim();
-            if (url) {
-                localStorage.setItem('lineBotWebAppUrl', url);
-                showToast('✅ บันทึก URL แล้ว', 'success');
-                checkStatus();
-            } else {
-                showToast('⚠️ กรุณาใส่ URL', 'error');
-            }
-        }
-
-        function getWebAppUrl() {
-            let url = webAppUrlInput.value.trim();
-            if (!url) {
-                url = localStorage.getItem('lineBotWebAppUrl') || '';
-            }
-            return url;
-        }
-
-        // ===== CALL WEB APP =====
-        async function callWebApp(action, payload = {}) {
-            const url = getWebAppUrl();
-            if (!url) {
-                throw new Error('⚠️ กรุณาตั้งค่า Web App URL ก่อน');
-            }
-
-            const response = await fetch(url, {
-                method: 'POST',
-                mode: 'cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: action,
-                    payload: payload
-                })
-            });
-
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`HTTP ${response.status}: ${text}`);
-            }
-
-            return await response.json();
-        }
-
-        // ===== UTILITY =====
+        
+        // Utility
         function getTimestamp() {
-            const now = new Date();
-            return String(now.getHours()).padStart(2, '0') + ':' +
-                   String(now.getMinutes()).padStart(2, '0');
+            return new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
         }
-
+        
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.className = 'toast ' + type;
+            toast.style.background = type === 'error' ? '#dc2626' : '#1f2937';
             toast.classList.add('show');
-            clearTimeout(toast._timer);
-            toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
-
+        
         function addMessage(text, type = 'received', meta = '') {
             const div = document.createElement('div');
             div.className = `message ${type}`;
             div.innerHTML = `
                 <div class="message-bubble">
                     ${text}
-                    ${meta ? `<span class="meta">${meta}</span>` : ''}
-                    <span class="time">${getTimestamp()}</span>
+                    ${meta ? `<div class="message-meta">${meta}</div>` : ''}
+                    <div class="timestamp">${getTimestamp()}</div>
                 </div>
             `;
             chatArea.appendChild(div);
             chatArea.scrollTop = chatArea.scrollHeight;
             return div;
         }
-
+        
         function addTyping() {
             const div = document.createElement('div');
             div.className = 'message received';
@@ -705,177 +481,142 @@
             chatArea.appendChild(div);
             chatArea.scrollTop = chatArea.scrollHeight;
         }
-
+        
         function removeTyping() {
             const typing = document.getElementById('typingIndicator');
             if (typing) typing.remove();
         }
 
-        function setStatus(status) {
-            statusText.textContent = status;
-            if (status === 'Online' || status === 'online') {
-                statusDot.className = 'status-dot online';
-            } else if (status === 'Offline' || status === 'offline') {
-                statusDot.className = 'status-dot offline';
-            } else {
-                statusDot.className = 'status-dot';
+        /**
+         * เรียก GAS Web App /exec ด้วย action-based JSON
+         * ใช้ Content-Type: text/plain เพื่อเลี่ยง CORS preflight (OPTIONS)
+         * ที่ GAS Web App ไม่รองรับ
+         */
+        async function callGas(action, payload = {}) {
+            const response = await fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action, payload })
+            });
+            const raw = await response.text();
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                throw new Error(`Server returned non-JSON (HTTP ${response.status}): ${raw.slice(0, 150)}`);
             }
         }
-
-        // ===== SEND MESSAGE =====
+        
+        // API Calls
         async function sendMessage() {
             const text = messageInput.value.trim();
-            if (!text) {
-                showToast('⚠️ กรุณาพิมพ์ข้อความ', 'error');
-                return;
-            }
-
+            if (!text) return;
+            
             addMessage(text, 'sent');
             messageInput.value = '';
             sendBtn.disabled = true;
             addTyping();
-
+            
             try {
-                const data = await callWebApp('sendText', { message: text });
+                const data = await callGas('sendText', { message: text });
                 removeTyping();
-
+                
                 if (data.success) {
-                    addMessage('✅ ส่งข้อความสำเร็จ!', 'received', '📤');
-                    showToast('✅ ส่งสำเร็จ', 'success');
+                    addMessage('✅ ส่งข้อความสำเร็จ!', 'received', `ส่งถึงผู้ใช้`);
+                    showToast('✅ ส่งข้อความสำเร็จ');
                 } else {
-                    addMessage(`❌ ${data.error || 'ส่งไม่สำเร็จ'}`, 'received');
-                    showToast('❌ ส่งไม่สำเร็จ', 'error');
+                    addMessage(`❌ ${data.error || 'เกิดข้อผิดพลาด'}`, 'received');
+                    showToast('❌ ส่งข้อความไม่สำเร็จ', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ ${error.message}`, 'received');
+                addMessage(`❌ Connection error: ${error.message}`, 'received');
                 showToast('❌ Connection error', 'error');
             } finally {
                 sendBtn.disabled = false;
             }
         }
-
-        // ===== SEND WITH AI =====
-        async function sendWithAI() {
-            const text = messageInput.value.trim();
-            if (!text) {
-                showToast('⚠️ กรุณาพิมพ์ข้อความ', 'error');
-                return;
-            }
-
-            const model = aiModelSelect.value;
-            const modelName = AI_MODELS[model] || model;
-
-            addMessage(`🤖 กำลังถาม ${modelName}...`, 'sent');
-            messageInput.value = '';
-            addTyping();
-
-            try {
-                const data = await callWebApp('sendWithAI', {
-                    message: text,
-                    model: model
-                });
-                removeTyping();
-
-                if (data.success) {
-                    addMessage(`🤖 ${data.aiResponse}`, 'received', `🧠 ${modelName}`);
-                    showToast('✅ AI ตอบแล้ว', 'success');
-                } else {
-                    addMessage(`❌ AI Error: ${data.error}`, 'received');
-                    showToast('❌ AI ล้มเหลว', 'error');
-                }
-            } catch (error) {
-                removeTyping();
-                addMessage(`❌ ${error.message}`, 'received');
-                showToast('❌ AI error', 'error');
-            }
-        }
-
-        // ===== GET PROFILE =====
+        
         async function getProfile() {
-            addMessage('👤 กำลังดึงโปรไฟล์...', 'received');
+            addMessage('🔍 กำลังดึงข้อมูลโปรไฟล์...', 'received');
             addTyping();
-
+            
             try {
-                const data = await callWebApp('getProfile', {});
+                const data = await callGas('getProfile');
                 removeTyping();
-
+                
                 if (data.success && data.profile) {
                     const p = data.profile;
                     addMessage(`
                         👤 <strong>${p.displayName || 'N/A'}</strong><br>
                         📱 ID: ${p.userId || 'N/A'}<br>
-                        🌐 ภาษา: ${p.language || 'N/A'}<br>
-                        💬 สถานะ: ${p.statusMessage || '—'}
-                        ${p.pictureUrl ? `<br><img src="${p.pictureUrl}" style="width:32px;border-radius:50%;margin-top:4px;">` : ''}
-                    `, 'received', '👤 โปรไฟล์');
-                    showToast('✅ โหลดโปรไฟล์สำเร็จ', 'success');
+                        🌐 Language: ${p.language || 'N/A'}<br>
+                        💬 Status: ${p.statusMessage || 'No status'}<br>
+                        ${p.pictureUrl ? `<img src="${p.pictureUrl}" style="width:40px;border-radius:50%;margin-top:4px;">` : ''}
+                    `, 'received', '👤 Profile');
+                    showToast('✅ ดึงโปรไฟล์สำเร็จ');
                 } else {
-                    addMessage(`❌ ${data.error || 'ไม่พบข้อมูล'}`, 'received');
+                    addMessage(`❌ ไม่สามารถดึงข้อมูล: ${data.error || 'Unknown error'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ ${error.message}`, 'received');
-                showToast('❌ Profile error', 'error');
+                addMessage(`❌ Error: ${error.message}`, 'received');
+                showToast('❌ Error fetching profile', 'error');
             }
         }
-
-        // ===== GET FOLLOWERS =====
+        
         async function getFollowers() {
-            addMessage('👥 กำลังดึงผู้ติดตาม...', 'received');
+            addMessage('👥 กำลังดึงรายชื่อผู้ติดตาม...', 'received');
             addTyping();
-
+            
             try {
-                const data = await callWebApp('getFollowers', { limit: 20 });
+                const data = await callGas('getFollowers', { limit: 20 });
                 removeTyping();
-
+                
                 if (data.success && data.data) {
                     const userIds = data.data.userIds || [];
-                    const next = data.data.next || 'END';
+                    const next = data.data.next || 'ไม่มีต่อ';
                     addMessage(`
-                        📊 <strong>${userIds.length}</strong> คน<br>
-                        🔄 Next: ${next}<br>
+                        📊 พบผู้ติดตาม <strong>${userIds.length}</strong> คน<br>
+                        🔄 Next token: ${next}<br>
                         ${userIds.slice(0, 5).map(id => `📱 ${id}`).join('<br>')}
-                        ${userIds.length > 5 ? `<br>... +${userIds.length - 5} คน` : ''}
-                    `, 'received', '👥 ผู้ติดตาม');
-                    showToast(`✅ พบ ${userIds.length} คน`, 'success');
+                        ${userIds.length > 5 ? `<br>...และอีก ${userIds.length - 5} คน` : ''}
+                    `, 'received', '👥 Followers');
+                    showToast(`✅ พบ ${userIds.length} คน`);
                 } else {
-                    addMessage(`❌ ${data.error || 'ไม่พบข้อมูล'}`, 'received');
+                    addMessage(`❌ ไม่พบข้อมูล: ${data.error || 'Unknown'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ ${error.message}`, 'received');
-                showToast('❌ Followers error', 'error');
+                addMessage(`❌ Error: ${error.message}`, 'received');
+                showToast('❌ Error fetching followers', 'error');
             }
         }
-
-        // ===== BROADCAST =====
+        
         async function broadcastMessage() {
-            const text = prompt('📢 ข้อความ Broadcast:', 'Hello from LINE Bot!');
+            const text = prompt('📢 ข้อความที่ต้องการ Broadcast:', 'Hello from MCP!');
             if (!text) return;
-
-            addMessage(`📢 Broadcast: "${text}"`, 'received');
+            
+            addMessage(`📢 กำลัง Broadcast: "${text}"`, 'received');
             addTyping();
-
+            
             try {
-                const data = await callWebApp('broadcast', { message: text });
+                const data = await callGas('broadcast', { message: text });
                 removeTyping();
-
+                
                 if (data.success) {
                     addMessage('✅ Broadcast สำเร็จ!', 'received');
-                    showToast('✅ Broadcast สำเร็จ', 'success');
+                    showToast('✅ Broadcast สำเร็จ');
                 } else {
-                    addMessage(`❌ ${data.error}`, 'received');
+                    addMessage(`❌ Error: ${data.error}`, 'received');
                     showToast('❌ Broadcast ไม่สำเร็จ', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ ${error.message}`, 'received');
+                addMessage(`❌ Error: ${error.message}`, 'received');
                 showToast('❌ Broadcast error', 'error');
             }
         }
-
-        // ===== SEND FLEX =====
+        
         async function sendFlexMessage() {
             const sampleFlex = {
                 type: 'bubble',
@@ -883,68 +624,65 @@
                     type: 'box',
                     layout: 'vertical',
                     contents: [
-                        { type: 'text', text: '📊 Flex Message', weight: 'bold', size: 'xl', color: '#58a6ff' },
-                        { type: 'text', text: 'จาก LINE Bot Dashboard', size: 'sm', color: '#8b949e', margin: 'md' },
+                        { type: 'text', text: '🎉 Flex Message!', weight: 'bold', size: 'xl', color: '#06C755' },
+                        { type: 'text', text: 'ส่งจาก MCP Web Interface', size: 'sm', color: '#666', margin: 'md' },
                         { type: 'separator', margin: 'md' },
-                        { type: 'text', text: '✅ พร้อมใช้งาน!', size: 'sm', color: '#3fb950', margin: 'md' }
+                        { type: 'text', text: '✅ ทำงานสำเร็จ!', size: 'sm', color: '#333', margin: 'md' }
                     ]
+                },
+                styles: {
+                    footer: { separator: true }
                 }
             };
-
-            addMessage('📊 กำลังส่ง Flex...', 'received');
+            
+            addMessage('📊 กำลังส่ง Flex Message...', 'received');
             addTyping();
-
+            
             try {
-                const data = await callWebApp('sendFlex', {
-                    altText: 'Flex Message',
-                    contents: JSON.stringify(sampleFlex)
-                });
+                const data = await callGas('sendFlex', { altText: 'Flex Message from MCP', contents: sampleFlex });
                 removeTyping();
-
+                
                 if (data.success) {
-                    addMessage('✅ ส่ง Flex สำเร็จ!', 'received');
-                    showToast('✅ Flex sent', 'success');
+                    addMessage('✅ ส่ง Flex Message สำเร็จ!', 'received');
+                    showToast('✅ Flex message sent');
                 } else {
-                    addMessage(`❌ ${data.error}`, 'received');
-                    showToast('❌ Flex ไม่สำเร็จ', 'error');
+                    addMessage(`❌ Error: ${data.error}`, 'received');
+                    showToast('❌ Flex send failed', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ ${error.message}`, 'received');
+                addMessage(`❌ Error: ${error.message}`, 'received');
                 showToast('❌ Flex error', 'error');
             }
         }
-
-        // ===== GET QUOTA =====
+        
         async function getQuota() {
             addMessage('📊 กำลังตรวจสอบ Quota...', 'received');
             addTyping();
-
+            
             try {
-                const data = await callWebApp('getQuota', {});
+                const data = await callGas('getQuota');
                 removeTyping();
-
+                
                 if (data.success && data.quota) {
                     const q = data.quota;
-                    const remaining = (q.limit != null && q.used != null) ? q.limit - q.used : 'N/A';
                     addMessage(`
                         📊 <strong>Message Quota</strong><br>
-                        📈 จำกัด: ${q.limit ?? 'N/A'}<br>
-                        📉 ใช้แล้ว: ${q.used ?? 'N/A'}<br>
-                        📊 เหลือ: ${remaining}
+                        📈 Limit: ${q.limit ?? 'N/A'}<br>
+                        📉 Used: ${q.used ?? 'N/A'}<br>
+                        📊 Remaining: ${(q.limit != null && q.used != null) ? q.limit - q.used : 'N/A'}
                     `, 'received', '📊 Quota');
-                    showToast('✅ ตรวจสอบ Quota สำเร็จ', 'success');
+                    showToast('✅ Quota checked');
                 } else {
-                    addMessage(`❌ ${data.error || 'ไม่พบข้อมูล'}`, 'received');
+                    addMessage(`❌ ${data.error || 'ไม่สามารถดึงข้อมูล'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ ${error.message}`, 'received');
+                addMessage(`❌ Error: ${error.message}`, 'received');
                 showToast('❌ Quota error', 'error');
             }
         }
-
-        // ===== FLEX BUILDER =====
+        
         function showFlexBuilder() {
             document.getElementById('flexModal').classList.add('show');
             document.getElementById('flexJsonInput').value = JSON.stringify({
@@ -954,105 +692,78 @@
                     layout: 'vertical',
                     contents: [
                         { type: 'text', text: 'Hello!', weight: 'bold', size: 'xl' },
-                        { type: 'text', text: 'Flex Message', size: 'sm', color: '#666' }
+                        { type: 'text', text: 'Flex message', size: 'sm', color: '#666' }
                     ]
                 }
             }, null, 2);
         }
-
+        
         function closeFlexBuilder() {
             document.getElementById('flexModal').classList.remove('show');
         }
-
+        
         async function sendCustomFlex() {
             const jsonInput = document.getElementById('flexJsonInput');
-            let contentsStr;
+            let contents;
             try {
-                JSON.parse(jsonInput.value);
-                contentsStr = jsonInput.value;
+                contents = JSON.parse(jsonInput.value);
             } catch (e) {
                 showToast('❌ JSON ไม่ถูกต้อง', 'error');
                 addMessage(`❌ JSON Error: ${e.message}`, 'received');
                 return;
             }
-
+            
             closeFlexBuilder();
-            addMessage('📊 กำลังส่ง Custom Flex...', 'received');
+            addMessage('📊 กำลังส่ง Flex Message...', 'received');
             addTyping();
-
+            
             try {
-                const data = await callWebApp('sendFlex', {
-                    altText: 'Custom Flex',
-                    contents: contentsStr
-                });
+                const data = await callGas('sendFlex', { altText: 'Custom Flex Message', contents });
                 removeTyping();
-
+                
                 if (data.success) {
-                    addMessage('✅ ส่ง Custom Flex สำเร็จ!', 'received');
-                    showToast('✅ Custom flex sent', 'success');
+                    addMessage('✅ ส่ง Flex Message สำเร็จ!', 'received');
+                    showToast('✅ Custom flex sent');
                 } else {
-                    addMessage(`❌ ${data.error}`, 'received');
-                    showToast('❌ ส่งไม่สำเร็จ', 'error');
+                    addMessage(`❌ Error: ${data.error}`, 'received');
+                    showToast('❌ Send failed', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ ${error.message}`, 'received');
+                addMessage(`❌ Error: ${error.message}`, 'received');
                 showToast('❌ Send error', 'error');
             }
         }
-
-        // ===== CLEAR CHAT =====
+        
         function clearChat() {
             chatArea.innerHTML = `
                 <div class="message received">
                     <div class="message-bubble">
-                        🗑️ ล้างแชทแล้ว<br>
-                        <span style="font-size:11px;opacity:0.6;">พร้อมใช้งาน</span>
+                        💬 แชทถูกล้างแล้ว<br>
+                        <small style="color: #999;">พร้อมใช้งาน</small>
                     </div>
                 </div>
             `;
             showToast('🗑️ ล้างแชทแล้ว');
         }
-
-        // ===== CHECK STATUS =====
+        
+        // Check server status
         async function checkStatus() {
             try {
-                const data = await callWebApp('status', {});
-                if (data.status === 'online') {
-                    setStatus('Online');
-                } else {
-                    setStatus('Offline');
+                const data = await callGas('status');
+                document.getElementById('statusText').textContent = data.status === 'online' ? 'Online' : 'Offline';
+                if (!data.channelTokenConfigured) {
+                    showToast('⚠️ Channel Token ไม่ได้ตั้งค่า', 'error');
                 }
             } catch (e) {
-                setStatus('Offline');
-                if (getWebAppUrl()) {
-                    showToast('⚠️ Server offline', 'error');
-                }
+                document.getElementById('statusText').textContent = 'Offline';
+                showToast('⚠️ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
             }
         }
-
-        // ===== INIT =====
-        loadConfig();
-        setStatus('Ready');
-
-        setTimeout(() => {
-            if (getWebAppUrl()) {
-                checkStatus();
-            }
-        }, 2000);
-
-        // ===== SHORTCUT =====
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                sendWithAI();
-                e.preventDefault();
-            }
-        });
-
-        console.log('💬 LINE Bot Dashboard Ready');
-        console.log('⌨️ Ctrl+Enter = AI Reply');
-        console.log('🔗 ตั้งค่า Web App URL ด้านบน');
+        checkStatus();
+        setInterval(checkStatus, 30000);
+        
+        console.log('🤖 LINE Bot MCP Web Interface Ready (GAS /exec mode)');
     </script>
-
 </body>
 </html>
