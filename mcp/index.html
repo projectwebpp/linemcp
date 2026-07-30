@@ -1,115 +1,192 @@
-<!-- index.html (standalone — host anywhere, calls a GAS Web App /exec URL) -->
+<!-- index.html - Pixel Art Style LINE Bot -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 LINE Bot MCP - Web Interface</title>
+    <title>🎮 LINE Bot MCP - Pixel Edition</title>
     <style>
+        /* ===== FONTS ===== */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            image-rendering: pixelated;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f0f2f5;
+            font-family: 'Press Start 2P', monospace;
+            background: #1a1a2e;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
         
+        /* ===== PIXEL BACKGROUND ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(0deg, 
+                    transparent, transparent 4px,
+                    rgba(255,255,255,0.03) 4px, rgba(255,255,255,0.03) 5px
+                ),
+                repeating-linear-gradient(90deg, 
+                    transparent, transparent 4px,
+                    rgba(255,255,255,0.03) 4px, rgba(255,255,255,0.03) 5px
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* ===== PIXEL BORDER ===== */
+        .pixel-border {
+            border: 4px solid #4ade80;
+            box-shadow: 
+                inset 0 0 0 2px #22c55e,
+                0 0 0 2px #22c55e,
+                0 0 20px rgba(74, 222, 128, 0.3);
+            image-rendering: pixelated;
+        }
+        
+        /* ===== APP CONTAINER ===== */
         .app-container {
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             height: 95vh;
-            background: white;
-            border-radius: 25px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            background: #16213e;
+            border: 6px solid #4ade80;
+            border-radius: 0;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            z-index: 1;
+            box-shadow: 
+                0 0 0 4px #0f3460,
+                0 0 0 8px #4ade80,
+                0 20px 60px rgba(0,0,0,0.8);
         }
         
+        /* ===== HEADER ===== */
         .header {
-            background: linear-gradient(135deg, #06C755, #05a94a);
-            color: white;
-            padding: 18px 20px;
+            background: linear-gradient(180deg, #0f3460, #16213e);
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 4px solid #4ade80;
             flex-shrink: 0;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(90deg, #4ade80 0px, #4ade80 8px, transparent 8px, transparent 16px);
         }
         
         .header h1 {
-            font-size: 18px;
-            font-weight: 700;
+            font-size: 14px;
+            color: #4ade80;
+            text-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .header h1 .pixel-icon {
+            font-size: 20px;
+            display: inline-block;
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
         
         .header-status {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 12px;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
+            font-size: 8px;
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+            padding: 6px 12px;
+            border: 2px solid #4ade80;
+            image-rendering: pixelated;
         }
         
         .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            border-radius: 0;
             background: #4ade80;
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #4ade80;
+            animation: blink 1s steps(2) infinite;
         }
         
-        @keyframes pulse {
+        @keyframes blink {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            50% { opacity: 0.2; }
         }
         
+        /* ===== CHAT AREA ===== */
         .chat-area {
             flex: 1;
-            padding: 16px 20px;
+            padding: 16px 16px 8px;
             overflow-y: auto;
-            background: #f8faf8;
+            background: #0a0a1a;
+            position: relative;
         }
         
         .chat-area::-webkit-scrollbar {
-            width: 4px;
+            width: 8px;
         }
         
         .chat-area::-webkit-scrollbar-track {
-            background: transparent;
+            background: #0a0a1a;
+            border-left: 2px solid #4ade80;
         }
         
         .chat-area::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 10px;
+            background: #4ade80;
+            border: 2px solid #0a0a1a;
+            image-rendering: pixelated;
         }
         
+        /* ===== MESSAGES ===== */
         .message {
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             display: flex;
             align-items: flex-end;
-            animation: slideIn 0.3s ease;
+            animation: pixelSlide 0.3s steps(4) forwards;
         }
         
-        @keyframes slideIn {
-            from {
+        @keyframes pixelSlide {
+            0% { 
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(10px) scale(0.95);
             }
-            to {
+            100% { 
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
         
@@ -123,63 +200,82 @@
         
         .message-bubble {
             max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 18px;
-            word-wrap: break-word;
-            font-size: 14px;
-            line-height: 1.5;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            padding: 12px 16px;
+            font-size: 11px;
+            line-height: 1.8;
+            border: 3px solid;
+            image-rendering: pixelated;
+            position: relative;
         }
         
         .message.sent .message-bubble {
-            background: #06C755;
-            color: white;
-            border-bottom-right-radius: 4px;
+            background: #4ade80;
+            color: #0a0a1a;
+            border-color: #22c55e;
+            border-right: none;
+        }
+        
+        .message.sent .message-bubble::after {
+            content: '';
+            position: absolute;
+            right: -12px;
+            bottom: 8px;
+            border-left: 10px solid #4ade80;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
         }
         
         .message.received .message-bubble {
-            background: white;
-            color: #333;
-            border-bottom-left-radius: 4px;
-            border: 1px solid #e5e7eb;
+            background: #1a1a2e;
+            color: #4ade80;
+            border-color: #4ade80;
+            border-left: none;
+        }
+        
+        .message.received .message-bubble::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            bottom: 8px;
+            border-right: 10px solid #1a1a2e;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
         }
         
         .message-meta {
-            font-size: 10px;
-            color: #999;
+            font-size: 7px;
+            color: rgba(74, 222, 128, 0.6);
             margin-top: 4px;
-            text-align: right;
-        }
-        
-        .message.received .message-meta {
-            text-align: left;
+            letter-spacing: 1px;
         }
         
         .timestamp {
-            font-size: 10px;
-            color: #999;
+            font-size: 7px;
+            color: rgba(74, 222, 128, 0.4);
             margin-top: 2px;
+            letter-spacing: 0.5px;
         }
         
+        /* ===== TYPING INDICATOR ===== */
         .typing-indicator {
-            padding: 10px 14px;
-            background: white;
-            border-radius: 18px;
+            padding: 12px 16px;
+            background: #1a1a2e;
+            border: 3px solid #4ade80;
             display: inline-block;
-            border: 1px solid #e5e7eb;
+            border-left: none;
         }
         
         .typing-dots {
             display: flex;
-            gap: 4px;
+            gap: 6px;
         }
         
         .typing-dots span {
-            width: 8px;
-            height: 8px;
-            background: #999;
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            display: block;
+            animation: typingPixels 1s steps(2) infinite;
         }
         
         .typing-dots span:nth-child(2) {
@@ -190,130 +286,188 @@
             animation-delay: 0.4s;
         }
         
-        @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-                opacity: 0.3;
-            }
-            30% {
-                transform: translateY(-8px);
-                opacity: 1;
-            }
+        @keyframes typingPixels {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1); }
         }
         
+        /* ===== INPUT AREA ===== */
         .input-area {
             padding: 12px 16px 16px;
-            border-top: 1px solid #e5e7eb;
-            background: white;
+            background: #0f3460;
+            border-top: 4px solid #4ade80;
             flex-shrink: 0;
+            position: relative;
+        }
+        
+        .input-area::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(90deg, #4ade80 0px, #4ade80 8px, transparent 8px, transparent 16px);
         }
         
         .input-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         
         .input-row input {
             flex: 1;
-            padding: 10px 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: 25px;
+            padding: 12px 16px;
+            background: #0a0a1a;
+            border: 3px solid #4ade80;
+            color: #4ade80;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
             outline: none;
-            font-size: 14px;
-            transition: border-color 0.2s;
+            transition: all 0.1s steps(2);
+            image-rendering: pixelated;
         }
         
         .input-row input:focus {
-            border-color: #06C755;
+            border-color: #22c55e;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);
+        }
+        
+        .input-row input::placeholder {
+            color: rgba(74, 222, 128, 0.3);
         }
         
         .input-row button {
-            padding: 10px 24px;
-            background: #06C755;
-            color: white;
-            border: none;
-            border-radius: 25px;
+            padding: 12px 20px;
+            background: #4ade80;
+            color: #0a0a1a;
+            border: 3px solid #22c55e;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: background 0.2s;
+            transition: all 0.1s steps(2);
+            image-rendering: pixelated;
             white-space: nowrap;
         }
         
         .input-row button:hover:not(:disabled) {
-            background: #05a94a;
+            background: #22c55e;
+            transform: scale(0.95);
         }
         
         .input-row button:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
         }
         
+        /* ===== TOOLS BAR ===== */
         .tools-bar {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             padding: 8px 0 0;
             flex-wrap: wrap;
         }
         
         .tools-bar button {
-            padding: 4px 12px;
-            background: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 15px;
-            font-size: 11px;
+            padding: 6px 12px;
+            background: #0a0a1a;
+            border: 2px solid #4ade80;
+            color: #4ade80;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
             cursor: pointer;
-            transition: all 0.2s;
-            color: #374151;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            transition: all 0.1s steps(2);
+            image-rendering: pixelated;
         }
         
         .tools-bar button:hover {
-            background: #06C755;
-            color: white;
-            border-color: #06C755;
+            background: #4ade80;
+            color: #0a0a1a;
+            transform: scale(0.95);
         }
         
-        .tools-bar button.primary {
-            background: #06C755;
-            color: white;
-            border-color: #06C755;
+        .tools-bar button.ai-btn {
+            border-color: #f472b6;
+            color: #f472b6;
         }
         
+        .tools-bar button.ai-btn:hover {
+            background: #f472b6;
+            color: #0a0a1a;
+        }
+        
+        /* ===== AI MODEL SELECTOR ===== */
+        .model-selector {
+            display: flex;
+            gap: 4px;
+            padding: 4px 0;
+            align-items: center;
+        }
+        
+        .model-selector label {
+            font-size: 7px;
+            color: #4ade80;
+            letter-spacing: 1px;
+        }
+        
+        .model-selector select {
+            background: #0a0a1a;
+            border: 2px solid #4ade80;
+            color: #4ade80;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            padding: 4px 8px;
+            outline: none;
+            image-rendering: pixelated;
+            cursor: pointer;
+        }
+        
+        .model-selector select option {
+            background: #0a0a1a;
+        }
+        
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: #1f2937;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-size: 13px;
+            background: #0a0a1a;
+            border: 3px solid #4ade80;
+            padding: 12px 24px;
+            color: #4ade80;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.1s steps(2);
             z-index: 1000;
             pointer-events: none;
+            image-rendering: pixelated;
         }
         
         .toast.show {
             opacity: 1;
         }
         
+        .toast.error {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        
+        /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(10, 10, 26, 0.9);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            image-rendering: pixelated;
         }
         
         .modal-overlay.show {
@@ -321,29 +475,34 @@
         }
         
         .modal {
-            background: white;
-            border-radius: 20px;
+            background: #16213e;
+            border: 4px solid #4ade80;
             padding: 24px;
-            max-width: 400px;
+            max-width: 420px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: 0 0 40px rgba(74, 222, 128, 0.2);
         }
         
         .modal h3 {
+            color: #4ade80;
+            font-size: 12px;
             margin-bottom: 16px;
-            color: #1f2937;
+            letter-spacing: 2px;
         }
         
         .modal textarea {
             width: 100%;
             min-height: 150px;
             padding: 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            font-family: monospace;
-            font-size: 13px;
+            background: #0a0a1a;
+            border: 3px solid #4ade80;
+            color: #4ade80;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px;
             resize: vertical;
+            outline: none;
         }
         
         .modal-actions {
@@ -354,102 +513,190 @@
         }
         
         .modal-actions button {
-            padding: 8px 20px;
-            border-radius: 12px;
-            border: none;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            border: 3px solid;
             cursor: pointer;
-            font-weight: 600;
+            transition: all 0.1s steps(2);
+            image-rendering: pixelated;
         }
         
         .modal-actions .btn-primary {
-            background: #06C755;
-            color: white;
+            background: #4ade80;
+            color: #0a0a1a;
+            border-color: #22c55e;
+        }
+        
+        .modal-actions .btn-primary:hover {
+            background: #22c55e;
+            transform: scale(0.95);
         }
         
         .modal-actions .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
+            background: #0a0a1a;
+            color: #4ade80;
+            border-color: #4ade80;
         }
         
+        .modal-actions .btn-secondary:hover {
+            background: #1a1a2e;
+            transform: scale(0.95);
+        }
+        
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .app-container {
                 border-radius: 0;
                 height: 100vh;
+                max-width: 100%;
+                border-width: 4px;
             }
+            
+            .header h1 {
+                font-size: 10px;
+            }
+            
+            .message-bubble {
+                font-size: 9px;
+                padding: 10px 12px;
+            }
+            
+            .input-row input {
+                font-size: 8px;
+                padding: 10px 12px;
+            }
+            
+            .input-row button {
+                font-size: 8px;
+                padding: 10px 14px;
+            }
+        }
+        
+        /* ===== SCROLLBAR PIXEL ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a1a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4ade80;
+            border: 2px solid #0a0a1a;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
+        <!-- HEADER -->
         <div class="header">
-            <h1>🤖 LINE Bot</h1>
+            <h1>
+                <span class="pixel-icon">🕹️</span>
+                LINE BOT
+            </h1>
             <div class="header-status">
                 <span class="status-dot"></span>
-                <span id="statusText">Online</span>
+                <span id="statusText">ONLINE</span>
             </div>
         </div>
         
+        <!-- CHAT AREA -->
         <div class="chat-area" id="chatArea">
             <div class="message received">
                 <div class="message-bubble">
-                    👋 สวัสดี! ระบบพร้อมใช้งานแล้ว<br>
-                    <small style="color: #999;">สามารถพิมพ์ข้อความเพื่อส่ง หรือใช้เครื่องมือด้านล่าง</small>
+                    🎮 PIXEL BOT ONLINE!<br>
+                    <span style="font-size:8px;opacity:0.7;">
+                        🔹 พิมพ์ข้อความหรือใช้ AI<br>
+                        🔹 เลือกโมเดล AI ด้านล่าง
+                    </span>
                 </div>
             </div>
         </div>
         
+        <!-- INPUT AREA -->
         <div class="input-area">
-            <div class="input-row">
-                <input type="text" id="messageInput" placeholder="พิมพ์ข้อความ..." 
-                       onkeypress="if(event.key === 'Enter') sendMessage()">
-                <button id="sendBtn" onclick="sendMessage()">ส่ง</button>
+            <!-- AI Model Selector -->
+            <div class="model-selector">
+                <label>🤖 AI:</label>
+                <select id="aiModelSelect">
+                    <option value="gemini-1.5-flash">⚡ Flash</option>
+                    <option value="gemini-1.5-pro">💎 Pro</option>
+                    <option value="gemini-1.0-pro">🔮 1.0 Pro</option>
+                </select>
+                <label style="margin-left:8px;">🌡️</label>
+                <select id="aiTempSelect">
+                    <option value="0.3">❄️ Cool</option>
+                    <option value="0.7" selected>🌤️ Balanced</option>
+                    <option value="1.0">🔥 Creative</option>
+                </select>
             </div>
+            
+            <div class="input-row">
+                <input type="text" id="messageInput" 
+                       placeholder="พิมพ์ข้อความ..." 
+                       onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button id="sendBtn" onclick="sendMessage()">SEND</button>
+            </div>
+            
             <div class="tools-bar">
-                <button onclick="sendFlexMessage()">📊 Flex</button>
-                <button onclick="broadcastMessage()">📢 Broadcast</button>
-                <button onclick="getProfile()">👤 Profile</button>
-                <button onclick="getFollowers()">👥 Followers</button>
-                <button onclick="getQuota()">📊 Quota</button>
-                <button onclick="showFlexBuilder()">✏️ Flex Builder</button>
-                <button onclick="clearChat()">🗑️ Clear</button>
+                <button onclick="sendWithAI()" class="ai-btn">🤖 AI Reply</button>
+                <button onclick="sendFlexMessage()">📊 FLEX</button>
+                <button onclick="broadcastMessage()">📢 BROAD</button>
+                <button onclick="getProfile()">👤 PROFILE</button>
+                <button onclick="getFollowers()">👥 FOLLOW</button>
+                <button onclick="getQuota()">📊 QUOTA</button>
+                <button onclick="showFlexBuilder()">✏️ BUILD</button>
+                <button onclick="clearChat()">🗑️ CLEAR</button>
             </div>
         </div>
     </div>
 
-    <!-- Flex Builder Modal -->
+    <!-- MODAL -->
     <div class="modal-overlay" id="flexModal">
         <div class="modal">
-            <h3>✏️ Flex Message Builder</h3>
+            <h3>✏️ FLEX BUILDER</h3>
             <textarea id="flexJsonInput" placeholder='{"type":"bubble","body":{"type":"box","layout":"vertical","contents":[{"type":"text","text":"Hello!"}]}}'></textarea>
             <div class="modal-actions">
-                <button class="btn-secondary" onclick="closeFlexBuilder()">ยกเลิก</button>
-                <button class="btn-primary" onclick="sendCustomFlex()">ส่ง Flex</button>
+                <button class="btn-secondary" onclick="closeFlexBuilder()">CANCEL</button>
+                <button class="btn-primary" onclick="sendCustomFlex()">SEND</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
+    <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // ★★★ ตั้งค่าตรงนี้: URL ของ GAS Web App ที่ Deploy แล้ว (ต้องลงท้ายด้วย /exec) ★★★
-        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxdXiV1F95c6d7uWz-3T7wqqiJK_EKjyMGHNyuJTv5umihRDz1Q0j7pPdnFcBUUCc0peA/exec';
-
+        // ===== CONFIG =====
+        const AI_MODELS = {
+            'gemini-1.5-flash': '⚡ Flash',
+            'gemini-1.5-pro': '💎 Pro', 
+            'gemini-1.0-pro': '🔮 1.0 Pro'
+        };
+        
+        // ===== DOM REFS =====
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
+        const aiModelSelect = document.getElementById('aiModelSelect');
+        const aiTempSelect = document.getElementById('aiTempSelect');
         
-        // Utility
+        // ===== UTILITY =====
         function getTimestamp() {
-            return new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            const now = new Date();
+            return String(now.getHours()).padStart(2,'0') + ':' + 
+                   String(now.getMinutes()).padStart(2,'0');
         }
         
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.style.background = type === 'error' ? '#dc2626' : '#1f2937';
+            toast.className = 'toast' + (type === 'error' ? ' error' : '');
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
         }
         
         function addMessage(text, type = 'received', meta = '') {
@@ -487,26 +734,17 @@
             if (typing) typing.remove();
         }
 
-        /**
-         * เรียก GAS Web App /exec ด้วย action-based JSON
-         * ใช้ Content-Type: text/plain เพื่อเลี่ยง CORS preflight (OPTIONS)
-         * ที่ GAS Web App ไม่รองรับ
-         */
-        async function callGas(action, payload = {}) {
-            const response = await fetch(GAS_WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action, payload })
+        // ===== GAS WRAPPER =====
+        function runServer(functionName, ...args) {
+            return new Promise((resolve, reject) => {
+                google.script.run
+                    .withSuccessHandler(resolve)
+                    .withFailureHandler((err) => reject(new Error(err.message || String(err))))
+                    [functionName](...args);
             });
-            const raw = await response.text();
-            try {
-                return JSON.parse(raw);
-            } catch (e) {
-                throw new Error(`Server returned non-JSON (HTTP ${response.status}): ${raw.slice(0, 150)}`);
-            }
         }
-        
-        // API Calls
+
+        // ===== SEND MESSAGE =====
         async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text) return;
@@ -514,109 +752,142 @@
             addMessage(text, 'sent');
             messageInput.value = '';
             sendBtn.disabled = true;
-            addTyping();
             
             try {
-                const data = await callGas('sendText', { message: text });
-                removeTyping();
-                
+                const data = await runServer('sendTextMessage', text);
                 if (data.success) {
-                    addMessage('✅ ส่งข้อความสำเร็จ!', 'received', `ส่งถึงผู้ใช้`);
-                    showToast('✅ ส่งข้อความสำเร็จ');
+                    addMessage('✅ SENT!', 'received', '📤 Message delivered');
+                    showToast('✅ Message sent!');
                 } else {
-                    addMessage(`❌ ${data.error || 'เกิดข้อผิดพลาด'}`, 'received');
-                    showToast('❌ ส่งข้อความไม่สำเร็จ', 'error');
+                    addMessage(`❌ ${data.error || 'ERROR'}`, 'received');
+                    showToast('❌ Send failed', 'error');
                 }
             } catch (error) {
-                removeTyping();
-                addMessage(`❌ Connection error: ${error.message}`, 'received');
+                addMessage(`❌ ${error.message}`, 'received');
                 showToast('❌ Connection error', 'error');
             } finally {
                 sendBtn.disabled = false;
             }
         }
-        
-        async function getProfile() {
-            addMessage('🔍 กำลังดึงข้อมูลโปรไฟล์...', 'received');
+
+        // ===== SEND WITH AI =====
+        async function sendWithAI() {
+            const text = messageInput.value.trim();
+            if (!text) {
+                showToast('⚠️ Type a message first!', 'error');
+                return;
+            }
+            
+            const model = aiModelSelect.value;
+            const modelName = AI_MODELS[model] || model;
+            
+            addMessage(`🤖 Asking ${modelName}...`, 'sent');
+            messageInput.value = '';
             addTyping();
             
             try {
-                const data = await callGas('getProfile');
+                const data = await runServer('sendMessageWithAI', text, model);
+                removeTyping();
+                
+                if (data.success) {
+                    addMessage(`🤖 ${data.aiResponse}`, 'received', `🧠 ${modelName}`);
+                    showToast(`✅ AI replied with ${modelName}`);
+                } else {
+                    addMessage(`❌ AI Error: ${data.error}`, 'received');
+                    showToast('❌ AI failed', 'error');
+                }
+            } catch (error) {
+                removeTyping();
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ AI error', 'error');
+            }
+        }
+
+        // ===== GET PROFILE =====
+        async function getProfile() {
+            addMessage('🔍 FETCHING PROFILE...', 'received');
+            addTyping();
+            
+            try {
+                const data = await runServer('getUserProfile');
                 removeTyping();
                 
                 if (data.success && data.profile) {
                     const p = data.profile;
                     addMessage(`
-                        👤 <strong>${p.displayName || 'N/A'}</strong><br>
-                        📱 ID: ${p.userId || 'N/A'}<br>
-                        🌐 Language: ${p.language || 'N/A'}<br>
-                        💬 Status: ${p.statusMessage || 'No status'}<br>
-                        ${p.pictureUrl ? `<img src="${p.pictureUrl}" style="width:40px;border-radius:50%;margin-top:4px;">` : ''}
-                    `, 'received', '👤 Profile');
-                    showToast('✅ ดึงโปรไฟล์สำเร็จ');
+                        👤 ${p.displayName || 'N/A'}<br>
+                        📱 ${p.userId || 'N/A'}<br>
+                        🌐 ${p.language || 'N/A'}<br>
+                        💬 ${p.statusMessage || 'No status'}
+                        ${p.pictureUrl ? `<br><img src="${p.pictureUrl}" style="width:32px;image-rendering:pixelated;border:2px solid #4ade80;margin-top:4px;">` : ''}
+                    `, 'received', '👤 PROFILE');
+                    showToast('✅ Profile loaded');
                 } else {
-                    addMessage(`❌ ไม่สามารถดึงข้อมูล: ${data.error || 'Unknown error'}`, 'received');
+                    addMessage(`❌ ${data.error || 'Unknown error'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ Error: ${error.message}`, 'received');
-                showToast('❌ Error fetching profile', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ Profile error', 'error');
             }
         }
-        
+
+        // ===== GET FOLLOWERS =====
         async function getFollowers() {
-            addMessage('👥 กำลังดึงรายชื่อผู้ติดตาม...', 'received');
+            addMessage('👥 FETCHING FOLLOWERS...', 'received');
             addTyping();
             
             try {
-                const data = await callGas('getFollowers', { limit: 20 });
+                const data = await runServer('getFollowerIds', 20);
                 removeTyping();
                 
                 if (data.success && data.data) {
                     const userIds = data.data.userIds || [];
-                    const next = data.data.next || 'ไม่มีต่อ';
+                    const next = data.data.next || 'END';
                     addMessage(`
-                        📊 พบผู้ติดตาม <strong>${userIds.length}</strong> คน<br>
-                        🔄 Next token: ${next}<br>
+                        📊 ${userIds.length} FOLLOWERS<br>
+                        🔄 NEXT: ${next}<br>
                         ${userIds.slice(0, 5).map(id => `📱 ${id}`).join('<br>')}
-                        ${userIds.length > 5 ? `<br>...และอีก ${userIds.length - 5} คน` : ''}
-                    `, 'received', '👥 Followers');
-                    showToast(`✅ พบ ${userIds.length} คน`);
+                        ${userIds.length > 5 ? `<br>... +${userIds.length - 5} more` : ''}
+                    `, 'received', '👥 FOLLOWERS');
+                    showToast(`✅ ${userIds.length} followers`);
                 } else {
-                    addMessage(`❌ ไม่พบข้อมูล: ${data.error || 'Unknown'}`, 'received');
+                    addMessage(`❌ ${data.error || 'Unknown'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ Error: ${error.message}`, 'received');
-                showToast('❌ Error fetching followers', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ Followers error', 'error');
             }
         }
-        
+
+        // ===== BROADCAST =====
         async function broadcastMessage() {
-            const text = prompt('📢 ข้อความที่ต้องการ Broadcast:', 'Hello from MCP!');
+            const text = prompt('📢 BROADCAST MESSAGE:', 'Pixel Bot says hello!');
             if (!text) return;
             
-            addMessage(`📢 กำลัง Broadcast: "${text}"`, 'received');
+            addMessage(`📢 BROADCAST: "${text}"`, 'received');
             addTyping();
             
             try {
-                const data = await callGas('broadcast', { message: text });
+                const data = await runServer('broadcastMessage', text);
                 removeTyping();
                 
                 if (data.success) {
-                    addMessage('✅ Broadcast สำเร็จ!', 'received');
-                    showToast('✅ Broadcast สำเร็จ');
+                    addMessage('✅ BROADCAST SENT!', 'received');
+                    showToast('✅ Broadcast sent');
                 } else {
-                    addMessage(`❌ Error: ${data.error}`, 'received');
-                    showToast('❌ Broadcast ไม่สำเร็จ', 'error');
+                    addMessage(`❌ ${data.error}`, 'received');
+                    showToast('❌ Broadcast failed', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ Error: ${error.message}`, 'received');
+                addMessage(`❌ ${error.message}`, 'received');
                 showToast('❌ Broadcast error', 'error');
             }
         }
-        
+
+        // ===== SEND FLEX =====
         async function sendFlexMessage() {
             const sampleFlex = {
                 type: 'bubble',
@@ -624,65 +895,65 @@
                     type: 'box',
                     layout: 'vertical',
                     contents: [
-                        { type: 'text', text: '🎉 Flex Message!', weight: 'bold', size: 'xl', color: '#06C755' },
-                        { type: 'text', text: 'ส่งจาก MCP Web Interface', size: 'sm', color: '#666', margin: 'md' },
+                        { type: 'text', text: '🎮 PIXEL FLEX!', weight: 'bold', size: 'xl', color: '#4ade80' },
+                        { type: 'text', text: 'Powered by MCP', size: 'sm', color: '#666', margin: 'md' },
                         { type: 'separator', margin: 'md' },
-                        { type: 'text', text: '✅ ทำงานสำเร็จ!', size: 'sm', color: '#333', margin: 'md' }
+                        { type: 'text', text: '✅ Pixel Perfect!', size: 'sm', color: '#333', margin: 'md' }
                     ]
-                },
-                styles: {
-                    footer: { separator: true }
                 }
             };
             
-            addMessage('📊 กำลังส่ง Flex Message...', 'received');
+            addMessage('📊 SENDING FLEX...', 'received');
             addTyping();
             
             try {
-                const data = await callGas('sendFlex', { altText: 'Flex Message from MCP', contents: sampleFlex });
+                const data = await runServer('sendFlexMessageToUser', 'Pixel Flex', JSON.stringify(sampleFlex));
                 removeTyping();
                 
                 if (data.success) {
-                    addMessage('✅ ส่ง Flex Message สำเร็จ!', 'received');
-                    showToast('✅ Flex message sent');
+                    addMessage('✅ FLEX SENT!', 'received');
+                    showToast('✅ Flex sent');
                 } else {
-                    addMessage(`❌ Error: ${data.error}`, 'received');
-                    showToast('❌ Flex send failed', 'error');
+                    addMessage(`❌ ${data.error}`, 'received');
+                    showToast('❌ Flex failed', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ Error: ${error.message}`, 'received');
+                addMessage(`❌ ${error.message}`, 'received');
                 showToast('❌ Flex error', 'error');
             }
         }
-        
+
+        // ===== GET QUOTA =====
         async function getQuota() {
-            addMessage('📊 กำลังตรวจสอบ Quota...', 'received');
+            addMessage('📊 CHECKING QUOTA...', 'received');
             addTyping();
             
             try {
-                const data = await callGas('getQuota');
+                const data = await runServer('getMessageQuota');
                 removeTyping();
                 
                 if (data.success && data.quota) {
                     const q = data.quota;
+                    const remaining = (q.limit != null && q.used != null) ? q.limit - q.used : 'N/A';
                     addMessage(`
-                        📊 <strong>Message Quota</strong><br>
-                        📈 Limit: ${q.limit ?? 'N/A'}<br>
-                        📉 Used: ${q.used ?? 'N/A'}<br>
-                        📊 Remaining: ${(q.limit != null && q.used != null) ? q.limit - q.used : 'N/A'}
-                    `, 'received', '📊 Quota');
+                        📊 MESSAGE QUOTA<br>
+                        📈 LIMIT: ${q.limit ?? 'N/A'}<br>
+                        📉 USED: ${q.used ?? 'N/A'}<br>
+                        📊 REMAINING: ${remaining}
+                    `, 'received', '📊 QUOTA');
                     showToast('✅ Quota checked');
                 } else {
-                    addMessage(`❌ ${data.error || 'ไม่สามารถดึงข้อมูล'}`, 'received');
+                    addMessage(`❌ ${data.error || 'Unknown'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ Error: ${error.message}`, 'received');
+                addMessage(`❌ ${error.message}`, 'received');
                 showToast('❌ Quota error', 'error');
             }
         }
-        
+
+        // ===== FLEX BUILDER =====
         function showFlexBuilder() {
             document.getElementById('flexModal').classList.add('show');
             document.getElementById('flexJsonInput').value = JSON.stringify({
@@ -691,8 +962,8 @@
                     type: 'box',
                     layout: 'vertical',
                     contents: [
-                        { type: 'text', text: 'Hello!', weight: 'bold', size: 'xl' },
-                        { type: 'text', text: 'Flex message', size: 'sm', color: '#666' }
+                        { type: 'text', text: '🎮 PIXEL', weight: 'bold', size: 'xl' },
+                        { type: 'text', text: 'Flex Message', size: 'sm', color: '#666' }
                     ]
                 }
             }, null, 2);
@@ -704,66 +975,79 @@
         
         async function sendCustomFlex() {
             const jsonInput = document.getElementById('flexJsonInput');
-            let contents;
+            let contentsStr;
             try {
-                contents = JSON.parse(jsonInput.value);
+                JSON.parse(jsonInput.value);
+                contentsStr = jsonInput.value;
             } catch (e) {
-                showToast('❌ JSON ไม่ถูกต้อง', 'error');
-                addMessage(`❌ JSON Error: ${e.message}`, 'received');
+                showToast('❌ Invalid JSON', 'error');
+                addMessage(`❌ JSON ERROR: ${e.message}`, 'received');
                 return;
             }
             
             closeFlexBuilder();
-            addMessage('📊 กำลังส่ง Flex Message...', 'received');
+            addMessage('📊 SENDING CUSTOM FLEX...', 'received');
             addTyping();
             
             try {
-                const data = await callGas('sendFlex', { altText: 'Custom Flex Message', contents });
+                const data = await runServer('sendFlexMessageToUser', 'Custom Flex', contentsStr);
                 removeTyping();
                 
                 if (data.success) {
-                    addMessage('✅ ส่ง Flex Message สำเร็จ!', 'received');
+                    addMessage('✅ CUSTOM FLEX SENT!', 'received');
                     showToast('✅ Custom flex sent');
                 } else {
-                    addMessage(`❌ Error: ${data.error}`, 'received');
+                    addMessage(`❌ ${data.error}`, 'received');
                     showToast('❌ Send failed', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`❌ Error: ${error.message}`, 'received');
+                addMessage(`❌ ${error.message}`, 'received');
                 showToast('❌ Send error', 'error');
             }
         }
-        
+
+        // ===== CLEAR CHAT =====
         function clearChat() {
             chatArea.innerHTML = `
                 <div class="message received">
                     <div class="message-bubble">
-                        💬 แชทถูกล้างแล้ว<br>
-                        <small style="color: #999;">พร้อมใช้งาน</small>
+                        🗑️ CHAT CLEARED<br>
+                        <span style="font-size:8px;opacity:0.7;">Ready for action!</span>
                     </div>
                 </div>
             `;
-            showToast('🗑️ ล้างแชทแล้ว');
+            showToast('🗑️ Chat cleared');
         }
-        
-        // Check server status
+
+        // ===== CHECK STATUS =====
         async function checkStatus() {
             try {
-                const data = await callGas('status');
-                document.getElementById('statusText').textContent = data.status === 'online' ? 'Online' : 'Offline';
-                if (!data.channelTokenConfigured) {
-                    showToast('⚠️ Channel Token ไม่ได้ตั้งค่า', 'error');
+                const data = await runServer('checkStatus');
+                document.getElementById('statusText').textContent = data.status === 'online' ? 'ONLINE' : 'OFFLINE';
+                if (!data.aiConfigured) {
+                    showToast('⚠️ AI not configured', 'error');
                 }
             } catch (e) {
-                document.getElementById('statusText').textContent = 'Offline';
-                showToast('⚠️ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+                document.getElementById('statusText').textContent = 'OFFLINE';
+                showToast('⚠️ Server offline', 'error');
             }
         }
+        
         checkStatus();
         setInterval(checkStatus, 30000);
-        
-        console.log('🤖 LINE Bot MCP Web Interface Ready (GAS /exec mode)');
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                sendWithAI();
+                e.preventDefault();
+            }
+        });
+
+        console.log('🎮 PIXEL BOT MCP READY');
+        console.log('🤖 AI Models:', Object.keys(AI_MODELS).join(', '));
+        console.log('⌨️ Ctrl+Enter = AI Reply');
     </script>
 </body>
 </html>
