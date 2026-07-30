@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINE Bot - Web App</title>
+    <title>LINE Bot - Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -27,7 +27,7 @@
             background: #161b22;
             border-radius: 16px;
             border: 1px solid #30363d;
-            padding: 28px;
+            padding: 24px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
@@ -35,23 +35,23 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 18px;
+            padding-bottom: 16px;
             border-bottom: 1px solid #30363d;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .header-left .icon {
-            font-size: 28px;
+            font-size: 24px;
         }
 
         .header-left h1 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #f0f6fc;
         }
@@ -63,18 +63,18 @@
         .header-status {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
+            gap: 6px;
+            font-size: 11px;
             color: #8b949e;
             background: #21262d;
-            padding: 4px 14px;
+            padding: 4px 12px;
             border-radius: 20px;
             border: 1px solid #30363d;
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             display: inline-block;
             background: #8b949e;
@@ -85,57 +85,60 @@
             box-shadow: 0 0 8px rgba(63, 185, 80, 0.3);
         }
 
-        /* Config Section */
+        .status-dot.offline {
+            background: #f85149;
+        }
+
+        /* Config */
         .config-section {
             background: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 10px;
-            padding: 14px 16px;
-            margin-bottom: 16px;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
         }
 
         .config-section label {
             display: block;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: #8b949e;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .config-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .config-row input {
             flex: 1;
             background: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 10px 14px;
+            border-radius: 6px;
+            padding: 8px 12px;
             color: #f0f6fc;
-            font-size: 13px;
+            font-size: 12px;
             outline: none;
+        }
+
+        .config-row input:focus {
+            border-color: #58a6ff;
         }
 
         .config-row input::placeholder {
             color: #484f58;
         }
 
-        .config-row input:focus {
-            border-color: #58a6ff;
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
-        }
-
         .config-row button {
-            padding: 10px 22px;
+            padding: 8px 16px;
             background: #21262d;
             border: 1px solid #30363d;
-            border-radius: 8px;
+            border-radius: 6px;
             color: #c9d1d9;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -150,14 +153,14 @@
         /* Model Selector */
         .model-selector {
             display: flex;
-            gap: 14px;
+            gap: 10px;
             align-items: center;
             flex-wrap: wrap;
-            padding: 8px 0 4px;
+            padding: 6px 0 2px;
         }
 
         .model-selector label {
-            font-size: 11px;
+            font-size: 10px;
             color: #8b949e;
             font-weight: 500;
         }
@@ -165,10 +168,10 @@
         .model-selector select {
             background: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 6px 12px;
+            border-radius: 5px;
+            padding: 4px 10px;
             color: #f0f6fc;
-            font-size: 13px;
+            font-size: 12px;
             outline: none;
             cursor: pointer;
         }
@@ -181,15 +184,15 @@
         .chat-area {
             background: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 10px;
-            padding: 16px;
-            height: 300px;
+            border-radius: 8px;
+            padding: 12px;
+            height: 280px;
             overflow-y: auto;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .chat-area::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         .chat-area::-webkit-scrollbar-thumb {
             background: #30363d;
@@ -197,7 +200,7 @@
         }
 
         .message {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             animation: fadeIn 0.3s ease;
         }
@@ -217,9 +220,9 @@
 
         .message-bubble {
             max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 13px;
             line-height: 1.5;
             word-wrap: break-word;
         }
@@ -227,24 +230,24 @@
         .message.sent .message-bubble {
             background: #1f6feb;
             color: #f0f6fc;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 3px;
         }
 
         .message.received .message-bubble {
             background: #21262d;
             color: #c9d1d9;
-            border-bottom-left-radius: 4px;
+            border-bottom-left-radius: 3px;
         }
 
         .message-bubble .time {
-            font-size: 10px;
+            font-size: 9px;
             color: rgba(255, 255, 255, 0.4);
-            margin-top: 4px;
+            margin-top: 3px;
             display: block;
         }
 
         .message-bubble .meta {
-            font-size: 10px;
+            font-size: 9px;
             color: rgba(255, 255, 255, 0.3);
             margin-top: 2px;
             display: block;
@@ -252,21 +255,21 @@
 
         /* Typing */
         .typing-indicator {
-            padding: 10px 14px;
+            padding: 8px 12px;
             background: #21262d;
-            border-radius: 12px;
+            border-radius: 10px;
             display: inline-block;
-            border-bottom-left-radius: 4px;
+            border-bottom-left-radius: 3px;
         }
 
         .typing-dots {
             display: flex;
-            gap: 5px;
+            gap: 4px;
         }
 
         .typing-dots span {
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
             background: #8b949e;
             border-radius: 50%;
             display: block;
@@ -278,43 +281,42 @@
 
         @keyframes typingBounce {
             0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
-            30% { transform: translateY(-6px); opacity: 1; }
+            30% { transform: translateY(-5px); opacity: 1; }
         }
 
         /* Input */
         .input-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .input-row input {
             flex: 1;
             background: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 10px;
-            padding: 12px 16px;
+            border-radius: 8px;
+            padding: 10px 14px;
             color: #f0f6fc;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
+        }
+
+        .input-row input:focus {
+            border-color: #58a6ff;
         }
 
         .input-row input::placeholder {
             color: #484f58;
         }
 
-        .input-row input:focus {
-            border-color: #58a6ff;
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
-        }
-
         .input-row button {
-            padding: 12px 28px;
+            padding: 10px 22px;
             background: #1f6feb;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             color: #f0f6fc;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -322,7 +324,6 @@
 
         .input-row button:hover:not(:disabled) {
             background: #388bfd;
-            transform: scale(0.98);
         }
 
         .input-row button:disabled {
@@ -333,17 +334,17 @@
         /* Tools */
         .tools-bar {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             flex-wrap: wrap;
         }
 
         .tools-bar button {
-            padding: 6px 14px;
+            padding: 5px 12px;
             background: transparent;
             border: 1px solid #30363d;
-            border-radius: 6px;
+            border-radius: 5px;
             color: #8b949e;
-            font-size: 11px;
+            font-size: 10px;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -367,15 +368,15 @@
         /* Toast */
         .toast {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(80px);
             background: #21262d;
             border: 1px solid #30363d;
-            border-radius: 10px;
-            padding: 12px 24px;
+            border-radius: 8px;
+            padding: 10px 20px;
             color: #f0f6fc;
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0;
             transition: all 0.4s ease;
             z-index: 1000;
@@ -421,30 +422,30 @@
         .modal {
             background: #161b22;
             border: 1px solid #30363d;
-            border-radius: 16px;
-            padding: 28px;
-            max-width: 500px;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 480px;
             width: 92%;
             max-height: 80vh;
             overflow-y: auto;
         }
 
         .modal h3 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             color: #f0f6fc;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .modal textarea {
             width: 100%;
-            min-height: 160px;
-            padding: 14px;
+            min-height: 140px;
+            padding: 12px;
             background: #0d1117;
             border: 1px solid #30363d;
-            border-radius: 10px;
+            border-radius: 8px;
             color: #f0f6fc;
-            font-size: 14px;
+            font-size: 13px;
             font-family: monospace;
             resize: vertical;
             outline: none;
@@ -456,15 +457,15 @@
 
         .modal-actions {
             display: flex;
-            gap: 12px;
-            margin-top: 18px;
+            gap: 10px;
+            margin-top: 14px;
             justify-content: flex-end;
         }
 
         .modal-actions button {
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-size: 13px;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             border: none;
@@ -492,10 +493,10 @@
 
         @media (max-width: 500px) {
             .app-container { padding: 16px; }
-            .header-left h1 { font-size: 17px; }
+            .header-left h1 { font-size: 16px; }
             .chat-area { height: 220px; }
-            .input-row input { font-size: 13px; padding: 10px 14px; }
-            .input-row button { padding: 10px 18px; font-size: 13px; }
+            .input-row input { font-size: 12px; padding: 8px 12px; }
+            .input-row button { padding: 8px 16px; font-size: 12px; }
         }
     </style>
 </head>
@@ -516,11 +517,10 @@
 
         <!-- CONFIG -->
         <div class="config-section">
-            <label>🔗 Web App URL (/exec)</label>
+            <label>🔗 Web App URL</label>
             <div class="config-row">
                 <input type="text" id="webAppUrl" 
-                       placeholder="https://script.google.com/macros/s/AKfycbxdXiV1F95c6d7uWz-3T7wqqiJK_EKjyMGHNyuJTv5umihRDz1Q0j7pPdnFcBUUCc0peA/exec"
-                       value="">
+                       placeholder="https://script.google.com/macros/s/.../exec">
                 <button onclick="saveConfig()">Set</button>
             </div>
         </div>
@@ -533,7 +533,7 @@
                 <option value="gemini-1.5-pro">💎 Pro</option>
                 <option value="gemini-1.0-pro">🔮 1.0 Pro</option>
             </select>
-            <label style="margin-left:8px;">🌡️ Temp</label>
+            <label style="margin-left:8px;">🌡️</label>
             <select id="aiTempSelect">
                 <option value="0.3">❄️ Cool</option>
                 <option value="0.7" selected>🌤️ Balanced</option>
@@ -546,7 +546,7 @@
             <div class="message received">
                 <div class="message-bubble">
                     👋 สวัสดี!<br>
-                    <span style="font-size:12px;opacity:0.6;">
+                    <span style="font-size:11px;opacity:0.6;">
                         ตั้งค่า Web App URL แล้วเริ่มใช้งาน
                     </span>
                 </div>
@@ -601,7 +601,6 @@
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const aiModelSelect = document.getElementById('aiModelSelect');
-        const aiTempSelect = document.getElementById('aiTempSelect');
         const webAppUrlInput = document.getElementById('webAppUrl');
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
@@ -716,6 +715,8 @@
             statusText.textContent = status;
             if (status === 'Online' || status === 'online') {
                 statusDot.className = 'status-dot online';
+            } else if (status === 'Offline' || status === 'offline') {
+                statusDot.className = 'status-dot offline';
             } else {
                 statusDot.className = 'status-dot';
             }
@@ -1006,7 +1007,7 @@
                 <div class="message received">
                     <div class="message-bubble">
                         🗑️ ล้างแชทแล้ว<br>
-                        <span style="font-size:12px;opacity:0.6;">พร้อมใช้งาน</span>
+                        <span style="font-size:11px;opacity:0.6;">พร้อมใช้งาน</span>
                     </div>
                 </div>
             `;
@@ -1048,7 +1049,7 @@
             }
         });
 
-        console.log('💬 LINE Bot Web App Ready');
+        console.log('💬 LINE Bot Dashboard Ready');
         console.log('⌨️ Ctrl+Enter = AI Reply');
         console.log('🔗 ตั้งค่า Web App URL ด้านบน');
     </script>
