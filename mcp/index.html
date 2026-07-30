@@ -1,8 +1,7 @@
-<!-- index.html - Pixel Art Style LINE Bot -->
+<!-- index.html - Pixel Art LINE Bot with AI (Standalone) -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎮 LINE Bot MCP - Pixel Edition</title>
@@ -403,6 +402,7 @@
             gap: 4px;
             padding: 4px 0;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .model-selector label {
@@ -444,6 +444,8 @@
             z-index: 1000;
             pointer-events: none;
             image-rendering: pixelated;
+            max-width: 90%;
+            text-align: center;
         }
         
         .toast.show {
@@ -544,6 +546,33 @@
             transform: scale(0.95);
         }
         
+        /* ===== CONFIG SECTION ===== */
+        .config-section {
+            padding: 6px 0 0;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .config-section label {
+            font-size: 7px;
+            color: rgba(74, 222, 128, 0.6);
+            letter-spacing: 1px;
+        }
+        
+        .config-section input {
+            background: #0a0a1a;
+            border: 2px solid #4ade80;
+            color: #4ade80;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            padding: 4px 8px;
+            outline: none;
+            width: 200px;
+            image-rendering: pixelated;
+        }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .app-container {
@@ -570,6 +599,11 @@
             .input-row button {
                 font-size: 8px;
                 padding: 10px 14px;
+            }
+            
+            .config-section input {
+                width: 120px;
+                font-size: 6px;
             }
         }
         
@@ -608,8 +642,8 @@
                 <div class="message-bubble">
                     🎮 PIXEL BOT ONLINE!<br>
                     <span style="font-size:8px;opacity:0.7;">
-                        🔹 พิมพ์ข้อความหรือใช้ AI<br>
-                        🔹 เลือกโมเดล AI ด้านล่าง
+                        🔹 ตั้งค่า URL Web App ด้านล่าง<br>
+                        🔹 พิมพ์ข้อความหรือใช้ AI
                     </span>
                 </div>
             </div>
@@ -617,6 +651,15 @@
         
         <!-- INPUT AREA -->
         <div class="input-area">
+            <!-- Config: Web App URL -->
+            <div class="config-section">
+                <label>🔗 WEB APP:</label>
+                <input type="text" id="webAppUrl" 
+                       placeholder="https://script.google.com/.../exec"
+                       value="">
+                <button onclick="saveConfig()" style="padding:4px 12px;background:#4ade80;color:#0a0a1a;border:2px solid #22c55e;font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;">SAVE</button>
+            </div>
+            
             <!-- AI Model Selector -->
             <div class="model-selector">
                 <label>🤖 AI:</label>
@@ -682,6 +725,61 @@
         const sendBtn = document.getElementById('sendBtn');
         const aiModelSelect = document.getElementById('aiModelSelect');
         const aiTempSelect = document.getElementById('aiTempSelect');
+        const webAppUrlInput = document.getElementById('webAppUrl');
+        
+        // ===== STORAGE =====
+        function loadConfig() {
+            const saved = localStorage.getItem('pixelBotWebAppUrl');
+            if (saved) {
+                webAppUrlInput.value = saved;
+            }
+        }
+        
+        function saveConfig() {
+            const url = webAppUrlInput.value.trim();
+            if (url) {
+                localStorage.setItem('pixelBotWebAppUrl', url);
+                showToast('✅ URL saved!');
+                checkStatus();
+            } else {
+                showToast('⚠️ Please enter Web App URL', 'error');
+            }
+        }
+        
+        function getWebAppUrl() {
+            let url = webAppUrlInput.value.trim();
+            if (!url) {
+                url = localStorage.getItem('pixelBotWebAppUrl') || '';
+            }
+            return url;
+        }
+        
+        // ===== API CALL =====
+        async function callWebApp(action, payload = {}) {
+            const url = getWebAppUrl();
+            if (!url) {
+                throw new Error('⚠️ กรุณาตั้งค่า Web App URL ก่อนใช้งาน');
+            }
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: action,
+                    payload: payload
+                })
+            });
+            
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`HTTP ${response.status}: ${text}`);
+            }
+            
+            return await response.json();
+        }
         
         // ===== UTILITY =====
         function getTimestamp() {
@@ -696,7 +794,7 @@
             toast.className = 'toast' + (type === 'error' ? ' error' : '');
             toast.classList.add('show');
             clearTimeout(toast._timer);
-            toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
         function addMessage(text, type = 'received', meta = '') {
@@ -734,16 +832,6 @@
             if (typing) typing.remove();
         }
 
-        // ===== GAS WRAPPER =====
-        function runServer(functionName, ...args) {
-            return new Promise((resolve, reject) => {
-                google.script.run
-                    .withSuccessHandler(resolve)
-                    .withFailureHandler((err) => reject(new Error(err.message || String(err))))
-                    [functionName](...args);
-            });
-        }
-
         // ===== SEND MESSAGE =====
         async function sendMessage() {
             const text = messageInput.value.trim();
@@ -754,7 +842,7 @@
             sendBtn.disabled = true;
             
             try {
-                const data = await runServer('sendTextMessage', text);
+                const data = await callWebApp('sendText', { message: text });
                 if (data.success) {
                     addMessage('✅ SENT!', 'received', '📤 Message delivered');
                     showToast('✅ Message sent!');
@@ -786,7 +874,10 @@
             addTyping();
             
             try {
-                const data = await runServer('sendMessageWithAI', text, model);
+                const data = await callWebApp('sendWithAI', { 
+                    message: text,
+                    model: model
+                });
                 removeTyping();
                 
                 if (data.success) {
@@ -809,7 +900,7 @@
             addTyping();
             
             try {
-                const data = await runServer('getUserProfile');
+                const data = await callWebApp('getProfile', {});
                 removeTyping();
                 
                 if (data.success && data.profile) {
@@ -838,7 +929,7 @@
             addTyping();
             
             try {
-                const data = await runServer('getFollowerIds', 20);
+                const data = await callWebApp('getFollowers', { limit: 20 });
                 removeTyping();
                 
                 if (data.success && data.data) {
@@ -870,7 +961,7 @@
             addTyping();
             
             try {
-                const data = await runServer('broadcastMessage', text);
+                const data = await callWebApp('broadcast', { message: text });
                 removeTyping();
                 
                 if (data.success) {
@@ -907,7 +998,10 @@
             addTyping();
             
             try {
-                const data = await runServer('sendFlexMessageToUser', 'Pixel Flex', JSON.stringify(sampleFlex));
+                const data = await callWebApp('sendFlex', { 
+                    altText: 'Pixel Flex',
+                    contents: JSON.stringify(sampleFlex)
+                });
                 removeTyping();
                 
                 if (data.success) {
@@ -930,7 +1024,7 @@
             addTyping();
             
             try {
-                const data = await runServer('getMessageQuota');
+                const data = await callWebApp('getQuota', {});
                 removeTyping();
                 
                 if (data.success && data.quota) {
@@ -990,7 +1084,10 @@
             addTyping();
             
             try {
-                const data = await runServer('sendFlexMessageToUser', 'Custom Flex', contentsStr);
+                const data = await callWebApp('sendFlex', {
+                    altText: 'Custom Flex',
+                    contents: contentsStr
+                });
                 removeTyping();
                 
                 if (data.success) {
@@ -1023,19 +1120,26 @@
         // ===== CHECK STATUS =====
         async function checkStatus() {
             try {
-                const data = await runServer('checkStatus');
+                const data = await callWebApp('status', {});
                 document.getElementById('statusText').textContent = data.status === 'online' ? 'ONLINE' : 'OFFLINE';
-                if (!data.aiConfigured) {
-                    showToast('⚠️ AI not configured', 'error');
+                if (data.aiConfigured) {
+                    document.getElementById('statusText').textContent += ' 🤖';
                 }
             } catch (e) {
                 document.getElementById('statusText').textContent = 'OFFLINE';
                 showToast('⚠️ Server offline', 'error');
             }
         }
+
+        // ===== INIT =====
+        loadConfig();
         
-        checkStatus();
-        setInterval(checkStatus, 30000);
+        // Auto-check status after 2 seconds
+        setTimeout(() => {
+            if (getWebAppUrl()) {
+                checkStatus();
+            }
+        }, 2000);
 
         // ===== KEYBOARD SHORTCUTS =====
         document.addEventListener('keydown', (e) => {
@@ -1048,6 +1152,7 @@
         console.log('🎮 PIXEL BOT MCP READY');
         console.log('🤖 AI Models:', Object.keys(AI_MODELS).join(', '));
         console.log('⌨️ Ctrl+Enter = AI Reply');
+        console.log('🔗 ตั้งค่า Web App URL ในช่องด้านบน');
     </script>
 </body>
 </html>
