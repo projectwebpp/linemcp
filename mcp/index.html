@@ -3,446 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦇 LINE Bot - Dark Gothic</title>
+    <title>LINE Bot - Dashboard</title>
     <style>
-        /* ===== FONTS ===== */
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
-        
         /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Cormorant Garamond', serif;
-            background: #0a0a0a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0d1117;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            background-image: 
-                radial-gradient(ellipse at 50% 0%, #1a0a0a 0%, #0a0a0a 70%);
         }
-        
-        /* ===== GOTHIC ORNAMENTS ===== */
-        .gothic-border {
-            position: relative;
-        }
-        
-        .gothic-border::before,
-        .gothic-border::after {
-            content: '⚜';
-            position: absolute;
-            font-size: 24px;
-            color: #8b0000;
-            opacity: 0.3;
-        }
-        
+
         /* ===== MAIN CONTAINER ===== */
         .app-container {
             width: 100%;
-            max-width: 560px;
-            background: linear-gradient(145deg, #1a0f0f, #0d0808);
-            border: 2px solid #2a0a0a;
-            border-radius: 12px;
-            padding: 28px 24px 24px;
-            box-shadow: 
-                0 0 40px rgba(139, 0, 0, 0.15),
-                inset 0 0 60px rgba(139, 0, 0, 0.05),
-                0 20px 60px rgba(0,0,0,0.8);
-            position: relative;
+            max-width: 580px;
+            background: #161b22;
+            border-radius: 16px;
+            border: 1px solid #30363d;
+            padding: 28px 28px 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
-        
-        .app-container::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: 20%;
-            right: 20%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #8b0000, transparent);
-        }
-        
-        .app-container::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 20%;
-            right: 20%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #8b0000, transparent);
-        }
-        
+
         /* ===== HEADER ===== */
         .header {
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(139, 0, 0, 0.3);
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        .header::after {
-            content: '✦ ✦ ✦';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0d0808;
-            padding: 0 12px;
-            font-size: 10px;
-            color: #8b0000;
-            letter-spacing: 8px;
-        }
-        
-        .header-icon {
-            font-size: 36px;
-            display: block;
-            margin-bottom: 6px;
-        }
-        
-        .header h1 {
-            font-family: 'Cinzel', serif;
-            font-weight: 900;
-            font-size: 22px;
-            color: #c0392b;
-            text-shadow: 0 0 30px rgba(139, 0, 0, 0.3);
-            letter-spacing: 6px;
-            text-transform: uppercase;
-        }
-        
-        .header .subtitle {
-            font-family: 'Cormorant Garamond', serif;
-            font-style: italic;
-            font-size: 14px;
-            color: rgba(139, 0, 0, 0.5);
-            letter-spacing: 4px;
-            margin-top: 2px;
-        }
-        
-        .status-bar {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 20px;
+        }
+
+        .header-left {
+            display: flex;
             align-items: center;
             gap: 12px;
-            margin-top: 10px;
-            font-size: 12px;
-            color: rgba(139, 0, 0, 0.6);
-            font-family: 'Cinzel', serif;
-            letter-spacing: 2px;
         }
-        
+
+        .header-left .icon {
+            font-size: 28px;
+        }
+
+        .header-left h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f0f6fc;
+            letter-spacing: -0.5px;
+        }
+
+        .header-left h1 span {
+            color: #58a6ff;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #8b949e;
+            background: #21262d;
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #8b0000;
             display: inline-block;
-            animation: pulse-red 2s ease-in-out infinite;
+            background: #8b949e;
         }
-        
+
         .status-dot.online {
-            background: #27ae60;
-            animation: pulse-green 2s ease-in-out infinite;
+            background: #3fb950;
+            box-shadow: 0 0 8px rgba(63, 185, 80, 0.3);
         }
-        
-        @keyframes pulse-red {
-            0%, 100% { opacity: 0.3; box-shadow: 0 0 0 0 rgba(139,0,0,0.2); }
-            50% { opacity: 1; box-shadow: 0 0 20px rgba(139,0,0,0.4); }
+
+        .status-dot.offline {
+            background: #f85149;
         }
-        
-        @keyframes pulse-green {
-            0%, 100% { opacity: 0.3; box-shadow: 0 0 0 0 rgba(39,174,96,0.2); }
-            50% { opacity: 1; box-shadow: 0 0 20px rgba(39,174,96,0.4); }
-        }
-        
+
         /* ===== CONFIG SECTION ===== */
         .config-section {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(139, 0, 0, 0.15);
-            border-radius: 8px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 10px;
             padding: 14px 16px;
             margin-bottom: 16px;
         }
-        
+
         .config-section label {
             display: block;
-            font-family: 'Cinzel', serif;
-            font-size: 10px;
-            color: rgba(139, 0, 0, 0.6);
-            letter-spacing: 2px;
-            margin-bottom: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #8b949e;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
-        
+
         .config-row {
             display: flex;
             gap: 10px;
         }
-        
+
         .config-row input {
             flex: 1;
-            background: #0a0505;
-            border: 1px solid rgba(139, 0, 0, 0.2);
-            border-radius: 6px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
             padding: 10px 14px;
-            color: #c0392b;
-            font-family: 'Cormorant Garamond', serif;
+            color: #f0f6fc;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.2s;
         }
-        
+
         .config-row input::placeholder {
-            color: rgba(139, 0, 0, 0.2);
-            font-style: italic;
+            color: #484f58;
         }
-        
+
         .config-row input:focus {
-            border-color: #8b0000;
-            box-shadow: 0 0 20px rgba(139, 0, 0, 0.1);
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
         }
-        
+
         .config-row button {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #1a0a0a, #2a0a0a);
-            border: 1px solid #8b0000;
-            border-radius: 6px;
-            color: #8b0000;
-            font-family: 'Cinzel', serif;
-            font-size: 10px;
-            letter-spacing: 2px;
+            padding: 10px 22px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #c9d1d9;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             white-space: nowrap;
         }
-        
+
         .config-row button:hover {
-            background: #8b0000;
-            color: #0a0505;
-            box-shadow: 0 0 30px rgba(139, 0, 0, 0.2);
+            background: #30363d;
+            border-color: #58a6ff;
+            color: #f0f6fc;
         }
-        
+
         /* ===== AI MODEL SELECTOR ===== */
         .model-selector {
             display: flex;
-            gap: 12px;
+            gap: 14px;
             align-items: center;
             flex-wrap: wrap;
             padding: 8px 0 4px;
         }
-        
-        .model-selector label {
-            font-family: 'Cinzel', serif;
-            font-size: 9px;
-            color: rgba(139, 0, 0, 0.5);
-            letter-spacing: 2px;
-            text-transform: uppercase;
+
+        .model-selector .group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        
+
+        .model-selector label {
+            font-size: 11px;
+            color: #8b949e;
+            font-weight: 500;
+        }
+
         .model-selector select {
-            background: #0a0505;
-            border: 1px solid rgba(139, 0, 0, 0.2);
+            background: #0d1117;
+            border: 1px solid #30363d;
             border-radius: 6px;
             padding: 6px 12px;
-            color: #8b0000;
-            font-family: 'Cormorant Garamond', serif;
+            color: #f0f6fc;
             font-size: 13px;
             outline: none;
             cursor: pointer;
         }
-        
+
         .model-selector select:focus {
-            border-color: #8b0000;
+            border-color: #58a6ff;
         }
-        
+
         .model-selector select option {
-            background: #0a0505;
-            color: #8b0000;
+            background: #161b22;
         }
-        
+
         /* ===== CHAT AREA ===== */
         .chat-area {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(139, 0, 0, 0.1);
-            border-radius: 8px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 10px;
             padding: 16px;
-            height: 320px;
+            height: 300px;
             overflow-y: auto;
             margin-bottom: 16px;
         }
-        
+
         .chat-area::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
-        
+
         .chat-area::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.3);
-            border-radius: 4px;
+            background: transparent;
         }
-        
+
         .chat-area::-webkit-scrollbar-thumb {
-            background: #8b0000;
-            border-radius: 4px;
+            background: #30363d;
+            border-radius: 10px;
         }
-        
+
         /* ===== MESSAGES ===== */
         .message {
             margin-bottom: 12px;
             display: flex;
-            align-items: flex-end;
-            animation: fadeIn 0.4s ease;
+            animation: fadeIn 0.3s ease;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .message.sent {
             justify-content: flex-end;
         }
-        
+
         .message.received {
             justify-content: flex-start;
         }
-        
+
         .message-bubble {
             max-width: 80%;
-            padding: 10px 16px;
+            padding: 10px 14px;
             border-radius: 12px;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.5;
+            word-wrap: break-word;
             position: relative;
         }
-        
+
         .message.sent .message-bubble {
-            background: linear-gradient(135deg, #1a0a0a, #2a0f0f);
-            border: 1px solid rgba(139, 0, 0, 0.3);
-            color: #c0392b;
+            background: #1f6feb;
+            color: #f0f6fc;
             border-bottom-right-radius: 4px;
         }
-        
+
         .message.received .message-bubble {
-            background: rgba(26, 10, 10, 0.6);
-            border: 1px solid rgba(139, 0, 0, 0.15);
-            color: #a0524a;
+            background: #21262d;
+            color: #c9d1d9;
             border-bottom-left-radius: 4px;
         }
-        
+
         .message-bubble .time {
-            font-size: 9px;
-            color: rgba(139, 0, 0, 0.3);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
             margin-top: 4px;
             display: block;
-            font-family: 'Cinzel', serif;
-            letter-spacing: 1px;
         }
-        
+
+        .message.received .message-bubble .time {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
         .message-bubble .meta {
-            font-size: 9px;
-            color: rgba(139, 0, 0, 0.4);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
             margin-top: 2px;
             display: block;
-            font-style: italic;
         }
-        
+
         /* ===== TYPING ===== */
         .typing-indicator {
-            padding: 10px 16px;
-            background: rgba(26, 10, 10, 0.6);
-            border: 1px solid rgba(139, 0, 0, 0.15);
+            padding: 10px 14px;
+            background: #21262d;
             border-radius: 12px;
             display: inline-block;
             border-bottom-left-radius: 4px;
         }
-        
+
         .typing-dots {
             display: flex;
-            gap: 6px;
+            gap: 5px;
         }
-        
+
         .typing-dots span {
-            width: 8px;
-            height: 8px;
-            background: #8b0000;
+            width: 7px;
+            height: 7px;
+            background: #8b949e;
             border-radius: 50%;
             display: block;
             animation: typingBounce 1.4s ease-in-out infinite;
         }
-        
+
         .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
         .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-        
+
         @keyframes typingBounce {
             0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
-            30% { transform: translateY(-8px); opacity: 1; }
+            30% { transform: translateY(-6px); opacity: 1; }
         }
-        
+
         /* ===== INPUT ===== */
         .input-area {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
-        
+
         .input-row {
             display: flex;
             gap: 10px;
         }
-        
+
         .input-row input {
             flex: 1;
-            background: #0a0505;
-            border: 1px solid rgba(139, 0, 0, 0.2);
-            border-radius: 8px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 10px;
             padding: 12px 16px;
-            color: #c0392b;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 16px;
+            color: #f0f6fc;
+            font-size: 14px;
             outline: none;
-            transition: all 0.3s;
+            transition: border-color 0.2s;
         }
-        
+
         .input-row input::placeholder {
-            color: rgba(139, 0, 0, 0.2);
-            font-style: italic;
+            color: #484f58;
         }
-        
+
         .input-row input:focus {
-            border-color: #8b0000;
-            box-shadow: 0 0 30px rgba(139, 0, 0, 0.1);
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
         }
-        
+
         .input-row button {
             padding: 12px 28px;
-            background: linear-gradient(135deg, #1a0a0a, #2a0a0a);
-            border: 1px solid #8b0000;
-            border-radius: 8px;
-            color: #8b0000;
-            font-family: 'Cinzel', serif;
-            font-size: 11px;
-            letter-spacing: 3px;
+            background: #1f6feb;
+            border: none;
+            border-radius: 10px;
+            color: #f0f6fc;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
+            transition: all 0.2s;
+            white-space: nowrap;
         }
-        
+
         .input-row button:hover:not(:disabled) {
-            background: #8b0000;
-            color: #0a0505;
-            box-shadow: 0 0 30px rgba(139, 0, 0, 0.2);
+            background: #388bfd;
             transform: scale(0.98);
         }
-        
+
         .input-row button:disabled {
-            opacity: 0.3;
+            opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         /* ===== TOOLS BAR ===== */
         .tools-bar {
             display: flex;
@@ -450,49 +375,46 @@
             flex-wrap: wrap;
             padding-top: 4px;
         }
-        
+
         .tools-bar button {
-            padding: 6px 14px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(139, 0, 0, 0.15);
+            padding: 5px 14px;
+            background: transparent;
+            border: 1px solid #30363d;
             border-radius: 6px;
-            color: rgba(139, 0, 0, 0.5);
-            font-family: 'Cinzel', serif;
-            font-size: 8px;
-            letter-spacing: 1.5px;
+            color: #8b949e;
+            font-size: 11px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
+            transition: all 0.2s;
         }
-        
+
         .tools-bar button:hover {
-            background: rgba(139, 0, 0, 0.15);
-            border-color: #8b0000;
-            color: #c0392b;
+            background: #21262d;
+            border-color: #58a6ff;
+            color: #f0f6fc;
         }
-        
+
         .tools-bar button.ai-btn {
-            border-color: rgba(139, 0, 0, 0.3);
-            color: #8b0000;
+            border-color: #3fb950;
+            color: #3fb950;
         }
-        
+
         .tools-bar button.ai-btn:hover {
-            background: rgba(139, 0, 0, 0.2);
-            border-color: #8b0000;
+            background: rgba(63, 185, 80, 0.1);
+            border-color: #3fb950;
         }
-        
+
         /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 30px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1a0f0f;
-            border: 1px solid #8b0000;
-            border-radius: 8px;
+            transform: translateX(-50%) translateY(80px);
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 10px;
             padding: 12px 24px;
-            color: #c0392b;
-            font-family: 'Cormorant Garamond', serif;
+            color: #f0f6fc;
             font-size: 14px;
             opacity: 0;
             transition: all 0.4s ease;
@@ -500,24 +422,24 @@
             pointer-events: none;
             max-width: 90%;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
-        
+
         .toast.show {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
-        
+
         .toast.error {
-            border-color: #8b0000;
-            color: #c0392b;
+            border-color: #f85149;
+            color: #f85149;
         }
-        
+
         .toast.success {
-            border-color: #27ae60;
-            color: #27ae60;
+            border-color: #3fb950;
+            color: #3fb950;
         }
-        
+
         /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed;
@@ -525,121 +447,117 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0, 0, 0, 0.7);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 2000;
             backdrop-filter: blur(4px);
         }
-        
+
         .modal-overlay.show {
             display: flex;
         }
-        
+
         .modal {
-            background: linear-gradient(145deg, #1a0f0f, #0d0808);
-            border: 1px solid #2a0a0a;
-            border-radius: 12px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
             padding: 28px;
-            max-width: 480px;
+            max-width: 500px;
             width: 92%;
             max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         }
-        
+
         .modal h3 {
-            font-family: 'Cinzel', serif;
+            font-size: 18px;
             font-weight: 700;
-            font-size: 16px;
-            color: #8b0000;
-            letter-spacing: 4px;
+            color: #f0f6fc;
             margin-bottom: 16px;
-            text-transform: uppercase;
-            text-align: center;
+            letter-spacing: -0.3px;
         }
-        
+
         .modal textarea {
             width: 100%;
             min-height: 160px;
             padding: 14px;
-            background: #0a0505;
-            border: 1px solid rgba(139, 0, 0, 0.2);
-            border-radius: 8px;
-            color: #c0392b;
-            font-family: 'Cormorant Garamond', serif;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            color: #f0f6fc;
             font-size: 14px;
+            font-family: 'SF Mono', 'Consolas', monospace;
             resize: vertical;
             outline: none;
         }
-        
+
         .modal textarea:focus {
-            border-color: #8b0000;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
         }
-        
+
         .modal-actions {
             display: flex;
             gap: 12px;
             margin-top: 18px;
             justify-content: flex-end;
         }
-        
+
         .modal-actions button {
             padding: 10px 24px;
-            border-radius: 6px;
-            font-family: 'Cinzel', serif;
-            font-size: 10px;
-            letter-spacing: 2px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
+            transition: all 0.2s;
+            border: none;
         }
-        
+
         .modal-actions .btn-primary {
-            background: linear-gradient(135deg, #1a0a0a, #2a0a0a);
-            border: 1px solid #8b0000;
-            color: #8b0000;
+            background: #1f6feb;
+            color: #f0f6fc;
         }
-        
+
         .modal-actions .btn-primary:hover {
-            background: #8b0000;
-            color: #0a0505;
+            background: #388bfd;
         }
-        
+
         .modal-actions .btn-secondary {
-            background: transparent;
-            border: 1px solid rgba(139, 0, 0, 0.2);
-            color: rgba(139, 0, 0, 0.4);
+            background: #21262d;
+            color: #8b949e;
         }
-        
+
         .modal-actions .btn-secondary:hover {
-            border-color: #8b0000;
-            color: #8b0000;
+            background: #30363d;
+            color: #f0f6fc;
         }
-        
+
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 480px) {
+        @media (max-width: 500px) {
             body { padding: 10px; }
             .app-container { padding: 16px; }
-            .header h1 { font-size: 17px; letter-spacing: 3px; }
-            .chat-area { height: 240px; }
-            .input-row input { font-size: 14px; padding: 10px 14px; }
-            .input-row button { padding: 10px 18px; font-size: 9px; }
+            .header-left h1 { font-size: 17px; }
+            .header-status { font-size: 10px; padding: 3px 10px; }
+            .chat-area { height: 220px; }
+            .input-row input { font-size: 13px; padding: 10px 14px; }
+            .input-row button { padding: 10px 18px; font-size: 13px; }
             .config-row input { font-size: 12px; }
-            .tools-bar button { font-size: 7px; padding: 4px 10px; }
+            .tools-bar button { font-size: 10px; padding: 4px 10px; }
+            .modal { padding: 20px; }
         }
-        
+
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
         ::-webkit-scrollbar-track {
-            background: #0a0505;
+            background: #0d1117;
         }
         ::-webkit-scrollbar-thumb {
-            background: #8b0000;
-            border-radius: 4px;
+            background: #30363d;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -648,14 +566,13 @@
     <div class="app-container">
         <!-- HEADER -->
         <div class="header">
-            <span class="header-icon">🦇</span>
-            <h1>Dark Bot</h1>
-            <div class="subtitle">— LINE Messaging Interface —</div>
-            <div class="status-bar">
+            <div class="header-left">
+                <span class="icon">💬</span>
+                <h1>LINE <span>Bot</span></h1>
+            </div>
+            <div class="header-status">
                 <span class="status-dot" id="statusDot"></span>
-                <span id="statusText">INITIALIZING</span>
-                <span style="opacity:0.3;">|</span>
-                <span id="aiStatus">AI: ⚡</span>
+                <span id="statusText">Ready</span>
             </div>
         </div>
 
@@ -664,34 +581,41 @@
             <label>🔗 Web App Endpoint</label>
             <div class="config-row">
                 <input type="text" id="webAppUrl" 
-                       placeholder="https://script.google.com/macros/s/AKfycbxdXiV1F95c6d7uWz-3T7wqqiJK_EKjyMGHNyuJTv5umihRDz1Q0j7pPdnFcBUUCc0peA/exec">
-                <button onclick="saveConfig()">SET</button>
+                       placeholder="https://script.google.com/macros/s/.../exec">
+                <button onclick="saveConfig()">Set</button>
             </div>
         </div>
 
         <!-- AI MODEL -->
         <div class="model-selector">
-            <label>🤖 Model</label>
-            <select id="aiModelSelect">
-                <option value="gemini-1.5-flash">⚡ Flash</option>
-                <option value="gemini-1.5-pro">💎 Pro</option>
-                <option value="gemini-1.0-pro">🔮 1.0 Pro</option>
-            </select>
-            <label style="margin-left:8px;">🌡️</label>
-            <select id="aiTempSelect">
-                <option value="0.3">❄️ Cool</option>
-                <option value="0.7" selected>🌤️ Balanced</option>
-                <option value="1.0">🔥 Creative</option>
-            </select>
+            <div class="group">
+                <label>🤖 Model</label>
+                <select id="aiModelSelect">
+                    <option value="gemini-1.5-flash">Flash</option>
+                    <option value="gemini-1.5-pro">Pro</option>
+                    <option value="gemini-1.0-pro">1.0 Pro</option>
+                </select>
+            </div>
+            <div class="group">
+                <label>🌡️ Temp</label>
+                <select id="aiTempSelect">
+                    <option value="0.3">Cool</option>
+                    <option value="0.7" selected>Balanced</option>
+                    <option value="1.0">Creative</option>
+                </select>
+            </div>
+            <div class="group" style="margin-left:auto;">
+                <span id="aiStatus" style="font-size:12px;color:#8b949e;">AI: ⚡</span>
+            </div>
         </div>
 
         <!-- CHAT -->
         <div class="chat-area" id="chatArea">
             <div class="message received">
                 <div class="message-bubble">
-                    Welcome, traveler.<br>
+                    Welcome!<br>
                     <span style="font-size:12px;opacity:0.6;">
-                        Set your Web App URL and begin.
+                        Set your Web App URL to begin.
                     </span>
                 </div>
             </div>
@@ -708,11 +632,11 @@
             <div class="tools-bar">
                 <button onclick="sendWithAI()" class="ai-btn">🤖 AI Reply</button>
                 <button onclick="sendFlexMessage()">📊 Flex</button>
-                <button onclick="broadcastMessage()">📢 Broad</button>
+                <button onclick="broadcastMessage()">📢 Broadcast</button>
                 <button onclick="getProfile()">👤 Profile</button>
-                <button onclick="getFollowers()">👥 Follow</button>
+                <button onclick="getFollowers()">👥 Followers</button>
                 <button onclick="getQuota()">📊 Quota</button>
-                <button onclick="showFlexBuilder()">✏️ Build</button>
+                <button onclick="showFlexBuilder()">✏️ Builder</button>
                 <button onclick="clearChat()">🗑️ Clear</button>
             </div>
         </div>
@@ -721,7 +645,7 @@
     <!-- MODAL -->
     <div class="modal-overlay" id="flexModal">
         <div class="modal">
-            <h3>✧ Flex Builder ✧</h3>
+            <h3>✏️ Flex Builder</h3>
             <textarea id="flexJsonInput" placeholder='{"type":"bubble","body":{"type":"box","layout":"vertical","contents":[{"type":"text","text":"Hello!"}]}}'></textarea>
             <div class="modal-actions">
                 <button class="btn-secondary" onclick="closeFlexBuilder()">Cancel</button>
@@ -754,7 +678,7 @@
 
         // ===== STORAGE =====
         function loadConfig() {
-            const saved = localStorage.getItem('darkBotWebAppUrl');
+            const saved = localStorage.getItem('lineBotWebAppUrl');
             if (saved) {
                 webAppUrlInput.value = saved;
                 setTimeout(checkStatus, 1000);
@@ -764,8 +688,8 @@
         function saveConfig() {
             const url = webAppUrlInput.value.trim();
             if (url) {
-                localStorage.setItem('darkBotWebAppUrl', url);
-                showToast('⚜ Endpoint set', 'success');
+                localStorage.setItem('lineBotWebAppUrl', url);
+                showToast('✅ Endpoint saved', 'success');
                 checkStatus();
             } else {
                 showToast('⚠️ Please enter a valid URL', 'error');
@@ -775,7 +699,7 @@
         function getWebAppUrl() {
             let url = webAppUrlInput.value.trim();
             if (!url) {
-                url = localStorage.getItem('darkBotWebAppUrl') || '';
+                url = localStorage.getItem('lineBotWebAppUrl') || '';
             }
             return url;
         }
@@ -860,8 +784,10 @@
 
         function setStatus(status, ai = null) {
             statusText.textContent = status;
-            if (status === 'ONLINE') {
+            if (status === 'Online' || status === 'online') {
                 statusDot.className = 'status-dot online';
+            } else if (status === 'Offline' || status === 'offline') {
+                statusDot.className = 'status-dot offline';
             } else {
                 statusDot.className = 'status-dot';
             }
@@ -882,15 +808,15 @@
             try {
                 const data = await callWebApp('sendText', { message: text });
                 if (data.success) {
-                    addMessage('✓ Delivered', 'received', '📤');
-                    showToast('⚜ Message sent', 'success');
+                    addMessage('✅ Sent', 'received', '📤');
+                    showToast('✅ Message sent', 'success');
                 } else {
-                    addMessage(`✗ ${data.error || 'Failed'}`, 'received');
-                    showToast('✗ Send failed', 'error');
+                    addMessage(`❌ ${data.error || 'Failed'}`, 'received');
+                    showToast('❌ Send failed', 'error');
                 }
             } catch (error) {
-                addMessage(`✗ ${error.message}`, 'received');
-                showToast('✗ Connection error', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ Connection error', 'error');
             } finally {
                 sendBtn.disabled = false;
             }
@@ -907,7 +833,7 @@
             const model = aiModelSelect.value;
             const modelName = AI_MODELS[model] || model;
 
-            addMessage(`◈ Asking ${modelName}...`, 'sent');
+            addMessage(`🤖 Asking ${modelName}...`, 'sent');
             messageInput.value = '';
             addTyping();
 
@@ -919,22 +845,22 @@
                 removeTyping();
 
                 if (data.success) {
-                    addMessage(`◆ ${data.aiResponse}`, 'received', `🧠 ${modelName}`);
-                    showToast(`⚜ AI replied`, 'success');
+                    addMessage(`🤖 ${data.aiResponse}`, 'received', `🧠 ${modelName}`);
+                    showToast('✅ AI replied', 'success');
                 } else {
-                    addMessage(`✗ AI Error: ${data.error}`, 'received');
-                    showToast('✗ AI failed', 'error');
+                    addMessage(`❌ AI Error: ${data.error}`, 'received');
+                    showToast('❌ AI failed', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`✗ ${error.message}`, 'received');
-                showToast('✗ AI error', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ AI error', 'error');
             }
         }
 
         // ===== GET PROFILE =====
         async function getProfile() {
-            addMessage('◈ Fetching profile...', 'received');
+            addMessage('👤 Fetching profile...', 'received');
             addTyping();
 
             try {
@@ -944,26 +870,26 @@
                 if (data.success && data.profile) {
                     const p = data.profile;
                     addMessage(`
-                        ◆ ${p.displayName || 'N/A'}<br>
-                        ◈ ID: ${p.userId || 'N/A'}<br>
-                        ◈ Lang: ${p.language || 'N/A'}<br>
-                        ◈ Status: ${p.statusMessage || '—'}
-                        ${p.pictureUrl ? `<br><img src="${p.pictureUrl}" style="width:32px;border-radius:4px;border:1px solid #8b0000;margin-top:4px;">` : ''}
+                        <strong>${p.displayName || 'N/A'}</strong><br>
+                        ID: ${p.userId || 'N/A'}<br>
+                        Language: ${p.language || 'N/A'}<br>
+                        Status: ${p.statusMessage || '—'}
+                        ${p.pictureUrl ? `<br><img src="${p.pictureUrl}" style="width:32px;border-radius:6px;margin-top:4px;">` : ''}
                     `, 'received', '👤 Profile');
-                    showToast('⚜ Profile loaded', 'success');
+                    showToast('✅ Profile loaded', 'success');
                 } else {
-                    addMessage(`✗ ${data.error || 'Unknown error'}`, 'received');
+                    addMessage(`❌ ${data.error || 'Unknown error'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`✗ ${error.message}`, 'received');
-                showToast('✗ Profile error', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ Profile error', 'error');
             }
         }
 
         // ===== GET FOLLOWERS =====
         async function getFollowers() {
-            addMessage('◈ Fetching followers...', 'received');
+            addMessage('👥 Fetching followers...', 'received');
             addTyping();
 
             try {
@@ -974,28 +900,28 @@
                     const userIds = data.data.userIds || [];
                     const next = data.data.next || 'END';
                     addMessage(`
-                        ◆ ${userIds.length} followers<br>
-                        ◈ Next: ${next}<br>
-                        ${userIds.slice(0, 5).map(id => `◈ ${id}`).join('<br>')}
-                        ${userIds.length > 5 ? `<br>◈ ... +${userIds.length - 5} more` : ''}
+                        <strong>${userIds.length}</strong> followers<br>
+                        Next: ${next}<br>
+                        ${userIds.slice(0, 5).map(id => `• ${id}`).join('<br>')}
+                        ${userIds.length > 5 ? `<br>• ... +${userIds.length - 5} more` : ''}
                     `, 'received', '👥 Followers');
-                    showToast(`⚜ ${userIds.length} followers`, 'success');
+                    showToast(`✅ ${userIds.length} followers`, 'success');
                 } else {
-                    addMessage(`✗ ${data.error || 'Unknown'}`, 'received');
+                    addMessage(`❌ ${data.error || 'Unknown'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`✗ ${error.message}`, 'received');
-                showToast('✗ Followers error', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ Followers error', 'error');
             }
         }
 
         // ===== BROADCAST =====
         async function broadcastMessage() {
-            const text = prompt('📢 Broadcast message:', 'Dark Bot speaks...');
+            const text = prompt('📢 Broadcast message:', 'Hello from LINE Bot!');
             if (!text) return;
 
-            addMessage(`◈ Broadcasting: "${text}"`, 'received');
+            addMessage(`📢 Broadcasting: "${text}"`, 'received');
             addTyping();
 
             try {
@@ -1003,16 +929,16 @@
                 removeTyping();
 
                 if (data.success) {
-                    addMessage('✓ Broadcast sent', 'received');
-                    showToast('⚜ Broadcast sent', 'success');
+                    addMessage('✅ Broadcast sent', 'received');
+                    showToast('✅ Broadcast sent', 'success');
                 } else {
-                    addMessage(`✗ ${data.error}`, 'received');
-                    showToast('✗ Broadcast failed', 'error');
+                    addMessage(`❌ ${data.error}`, 'received');
+                    showToast('❌ Broadcast failed', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`✗ ${error.message}`, 'received');
-                showToast('✗ Broadcast error', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ Broadcast error', 'error');
             }
         }
 
@@ -1024,41 +950,41 @@
                     type: 'box',
                     layout: 'vertical',
                     contents: [
-                        { type: 'text', text: '🦇 Dark Flex', weight: 'bold', size: 'xl', color: '#8b0000' },
-                        { type: 'text', text: 'From the shadows', size: 'sm', color: '#666', margin: 'md' },
+                        { type: 'text', text: '📊 Flex Message', weight: 'bold', size: 'xl', color: '#58a6ff' },
+                        { type: 'text', text: 'From LINE Bot Dashboard', size: 'sm', color: '#8b949e', margin: 'md' },
                         { type: 'separator', margin: 'md' },
-                        { type: 'text', text: '⚜ Gothic Style', size: 'sm', color: '#333', margin: 'md' }
+                        { type: 'text', text: '✅ Ready!', size: 'sm', color: '#3fb950', margin: 'md' }
                     ]
                 }
             };
 
-            addMessage('◈ Sending Flex...', 'received');
+            addMessage('📊 Sending Flex...', 'received');
             addTyping();
 
             try {
                 const data = await callWebApp('sendFlex', {
-                    altText: 'Dark Flex',
+                    altText: 'Flex Message',
                     contents: JSON.stringify(sampleFlex)
                 });
                 removeTyping();
 
                 if (data.success) {
-                    addMessage('✓ Flex sent', 'received');
-                    showToast('⚜ Flex sent', 'success');
+                    addMessage('✅ Flex sent', 'received');
+                    showToast('✅ Flex sent', 'success');
                 } else {
-                    addMessage(`✗ ${data.error}`, 'received');
-                    showToast('✗ Flex failed', 'error');
+                    addMessage(`❌ ${data.error}`, 'received');
+                    showToast('❌ Flex failed', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`✗ ${error.message}`, 'received');
-                showToast('✗ Flex error', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ Flex error', 'error');
             }
         }
 
         // ===== GET QUOTA =====
         async function getQuota() {
-            addMessage('◈ Checking quota...', 'received');
+            addMessage('📊 Checking quota...', 'received');
             addTyping();
 
             try {
@@ -1069,19 +995,19 @@
                     const q = data.quota;
                     const remaining = (q.limit != null && q.used != null) ? q.limit - q.used : 'N/A';
                     addMessage(`
-                        ◆ Message Quota<br>
-                        ◈ Limit: ${q.limit ?? 'N/A'}<br>
-                        ◈ Used: ${q.used ?? 'N/A'}<br>
-                        ◈ Remaining: ${remaining}
+                        <strong>Message Quota</strong><br>
+                        Limit: ${q.limit ?? 'N/A'}<br>
+                        Used: ${q.used ?? 'N/A'}<br>
+                        Remaining: ${remaining}
                     `, 'received', '📊 Quota');
-                    showToast('⚜ Quota checked', 'success');
+                    showToast('✅ Quota checked', 'success');
                 } else {
-                    addMessage(`✗ ${data.error || 'Unknown'}`, 'received');
+                    addMessage(`❌ ${data.error || 'Unknown'}`, 'received');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`✗ ${error.message}`, 'received');
-                showToast('✗ Quota error', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ Quota error', 'error');
             }
         }
 
@@ -1094,7 +1020,7 @@
                     type: 'box',
                     layout: 'vertical',
                     contents: [
-                        { type: 'text', text: '🦇 Dark', weight: 'bold', size: 'xl' },
+                        { type: 'text', text: 'Hello!', weight: 'bold', size: 'xl' },
                         { type: 'text', text: 'Flex Message', size: 'sm', color: '#666' }
                     ]
                 }
@@ -1112,13 +1038,13 @@
                 JSON.parse(jsonInput.value);
                 contentsStr = jsonInput.value;
             } catch (e) {
-                showToast('✗ Invalid JSON', 'error');
-                addMessage(`✗ JSON Error: ${e.message}`, 'received');
+                showToast('❌ Invalid JSON', 'error');
+                addMessage(`❌ JSON Error: ${e.message}`, 'received');
                 return;
             }
 
             closeFlexBuilder();
-            addMessage('◈ Sending custom Flex...', 'received');
+            addMessage('📊 Sending custom Flex...', 'received');
             addTyping();
 
             try {
@@ -1129,16 +1055,16 @@
                 removeTyping();
 
                 if (data.success) {
-                    addMessage('✓ Custom Flex sent', 'received');
-                    showToast('⚜ Custom flex sent', 'success');
+                    addMessage('✅ Custom Flex sent', 'received');
+                    showToast('✅ Custom flex sent', 'success');
                 } else {
-                    addMessage(`✗ ${data.error}`, 'received');
-                    showToast('✗ Send failed', 'error');
+                    addMessage(`❌ ${data.error}`, 'received');
+                    showToast('❌ Send failed', 'error');
                 }
             } catch (error) {
                 removeTyping();
-                addMessage(`✗ ${error.message}`, 'received');
-                showToast('✗ Send error', 'error');
+                addMessage(`❌ ${error.message}`, 'received');
+                showToast('❌ Send error', 'error');
             }
         }
 
@@ -1147,8 +1073,8 @@
             chatArea.innerHTML = `
                 <div class="message received">
                     <div class="message-bubble">
-                        ◈ Chat cleared<br>
-                        <span style="font-size:12px;opacity:0.6;">The shadows remain...</span>
+                        🗑️ Chat cleared<br>
+                        <span style="font-size:12px;opacity:0.6;">Ready</span>
                     </div>
                 </div>
             `;
@@ -1160,12 +1086,12 @@
             try {
                 const data = await callWebApp('status', {});
                 if (data.status === 'online') {
-                    setStatus('ONLINE', data.aiConfigured ? '⚡' : '—');
+                    setStatus('Online', data.aiConfigured ? '⚡' : '—');
                 } else {
-                    setStatus('OFFLINE');
+                    setStatus('Offline');
                 }
             } catch (e) {
-                setStatus('OFFLINE');
+                setStatus('Offline');
                 if (getWebAppUrl()) {
                     showToast('⚠️ Server offline', 'error');
                 }
@@ -1174,9 +1100,8 @@
 
         // ===== INIT =====
         loadConfig();
-        setStatus('READY');
+        setStatus('Ready');
 
-        // Auto-check after 2s if URL is set
         setTimeout(() => {
             if (getWebAppUrl()) {
                 checkStatus();
@@ -1191,7 +1116,7 @@
             }
         });
 
-        console.log('🦇 Dark Bot initialized');
+        console.log('💬 LINE Bot Dashboard initialized');
         console.log('⌨️ Ctrl+Enter = AI Reply');
         console.log('🔗 Set your Web App URL above');
     </script>
