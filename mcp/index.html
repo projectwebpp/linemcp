@@ -691,6 +691,17 @@
             return div.innerHTML;
         }
 
+        // เข้ารหัสสำหรับใส่ใน HTML attribute โดยเฉพาะ (escapeHtml เพียงอย่างเดียวไม่ครอบคลุม
+        // เครื่องหมายคำพูดเดี่ยว/คู่ในทุกเบราว์เซอร์ ซึ่งอันตรายถ้าเอาไปฝังใน onclick="...'${x}'...")
+        function escapeAttr(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         // ---------------- Inbox ----------------
         let inboxPollInterval = null;
         let currentThreadUserId = null;
@@ -729,12 +740,18 @@
                     container.innerHTML = '<div class="inbox-empty">ยังไม่มีข้อความเข้ามา</div>';
                     return;
                 }
+                // ใช้ data-* attribute (escape แบบ attribute-safe) + event delegation แทน
+                // การฝัง userId/displayName ลงใน onclick="..." ตรงๆ ซึ่งถ้าชื่อผู้ใช้มี
+                // เครื่องหมายคำพูดเดี่ยวจะทำให้ markup พังและกดตอบกลับไม่ได้
                 container.innerHTML = data.conversations.map(c => {
                     const avatar = c.pictureUrl || '';
                     const prefix = c.lastDirection === 'out' ? '↩ ' : '';
                     return `
-                        <div class="inbox-item" onclick="openThread('${c.userId}', '${escapeHtml(c.displayName)}', '${avatar}')">
-                            ${avatar ? `<img class="inbox-avatar" src="${avatar}">` : `<div class="inbox-avatar"></div>`}
+                        <div class="inbox-item"
+                             data-user-id="${escapeAttr(c.userId)}"
+                             data-display-name="${escapeAttr(c.displayName)}"
+                             data-avatar="${escapeAttr(avatar)}">
+                            ${avatar ? `<img class="inbox-avatar" src="${escapeAttr(avatar)}">` : `<div class="inbox-avatar"></div>`}
                             <div class="inbox-info">
                                 <div class="inbox-name">${escapeHtml(c.displayName)}</div>
                                 <div class="inbox-preview">${prefix}${escapeHtml((c.lastText || '').slice(0, 50))}</div>
@@ -746,6 +763,13 @@
                 // polling เงียบๆ ไม่ต้องรบกวนด้วย toast ทุกครั้ง
             }
         }
+
+        // event delegation: จับคลิกที่ .inbox-item แต่ละอันแล้วเปิด thread ของ userId นั้น
+        document.getElementById('inboxListContainer').addEventListener('click', function (e) {
+            const item = e.target.closest('.inbox-item');
+            if (!item) return;
+            openThread(item.dataset.userId, item.dataset.displayName, item.dataset.avatar);
+        });
 
         async function openThread(userId, displayName, pictureUrl) {
             currentThreadUserId = userId;
@@ -806,7 +830,7 @@
                         <div class="message-bubble">
                             ${escapeHtml(m.text)}
                             <div class="timestamp">${new Date(m.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}</div>
-                            ${m.direction === 'in' && m.quoteToken ? `<button class="quote-reply-btn" data-quote-token="${escapeHtml(m.quoteToken)}" data-quote-text="${escapeHtml((m.text || '').slice(0, 60))}" onclick="handleQuoteClick(this)">↩ ตอบกลับข้อความนี้</button>` : ''}
+                            ${m.direction === 'in' && m.quoteToken ? `<button class="quote-reply-btn" data-quote-token="${escapeAttr(m.quoteToken)}" data-quote-text="${escapeAttr((m.text || '').slice(0, 60))}" onclick="handleQuoteClick(this)">↩ ตอบกลับข้อความนี้</button>` : ''}
                         </div>
                     </div>
                 `).join('');
