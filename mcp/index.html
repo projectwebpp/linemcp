@@ -607,6 +607,7 @@
             <div class="thread-reply-row">
                 <input type="text" id="threadReplyInput" placeholder="พิมพ์ตอบกลับ..."
                        onkeypress="if(event.key === 'Enter') sendThreadReply()">
+                <button id="aiSuggestBtn" onclick="suggestAiReply()" title="ให้ AI ร่างคำตอบมาใส่ในช่องพิมพ์ (ยังไม่ส่ง ต้องกดส่งเอง)">🤖 AI แนะนำ</button>
                 <button onclick="sendThreadReply()">ส่ง</button>
             </div>
         </div>
@@ -837,6 +838,55 @@
                 container.scrollTop = container.scrollHeight;
             } catch (e) {
                 // polling เงียบๆ
+            }
+        }
+
+        /**
+         * ให้ AI ช่วยร่างคำตอบ (action 'suggestAI' — ไม่ push เข้า LINE, ไม่ log ใดๆ)
+         * เอาไปใส่ในช่องพิมพ์ให้แอดมินอ่าน/แก้ก่อน แล้วกด "ส่ง" เองอีกที
+         * ถ้าแอดมินยังไม่ได้พิมพ์อะไรในช่อง จะหยิบข้อความล่าสุดฝั่งผู้ใช้ ('in')
+         * ในเธรดนี้มาเป็นคำถามให้ AI แทน
+         */
+        async function suggestAiReply() {
+            if (!currentThreadUserId) return;
+            const input = document.getElementById('threadReplyInput');
+            const suggestBtn = document.getElementById('aiSuggestBtn');
+            let question = input.value.trim();
+
+            if (!question) {
+                try {
+                    const msgsData = await callGas('getMessages', { userId: currentThreadUserId });
+                    if (msgsData.success && msgsData.messages.length) {
+                        const lastIn = [...msgsData.messages].reverse().find(m => m.direction === 'in');
+                        question = lastIn ? lastIn.text : '';
+                    }
+                } catch (e) {
+                    // ปล่อยผ่าน จะไปเช็ค question ว่างด้านล่าง
+                }
+            }
+
+            if (!question) {
+                showToast('⚠️ ไม่มีข้อความให้ AI ช่วยร่างคำตอบ', 'error');
+                return;
+            }
+
+            suggestBtn.disabled = true;
+            const originalLabel = suggestBtn.textContent;
+            suggestBtn.textContent = '🤖 กำลังคิด...';
+            try {
+                const model = modelSelect.value;
+                const data = await callGas('suggestAI', { question, model });
+                if (data.success) {
+                    input.value = data.answer;
+                    input.focus();
+                } else {
+                    showToast(`❌ ${data.error || 'AI ร่างคำตอบไม่สำเร็จ'}`, 'error');
+                }
+            } catch (error) {
+                showToast('❌ Connection error', 'error');
+            } finally {
+                suggestBtn.disabled = false;
+                suggestBtn.textContent = originalLabel;
             }
         }
 
