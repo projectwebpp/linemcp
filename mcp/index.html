@@ -292,6 +292,38 @@
             transform: translate(2px, 2px);
         }
 
+        .tools-bar button {
+            position: relative;
+        }
+
+        .inbox-badge {
+            display: none;
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 14px;
+            height: 14px;
+            padding: 0 3px;
+            background: var(--accent-magenta);
+            color: #fff;
+            border: 1px solid var(--border-dark);
+            font-family: var(--px-display);
+            font-size: 7px;
+            line-height: 14px;
+            text-align: center;
+            border-radius: 2px;
+        }
+
+        .inbox-item.unread {
+            border-color: var(--accent-magenta);
+        }
+
+        .inbox-item.unread .inbox-name::after {
+            content: ' ● ใหม่';
+            color: var(--accent-magenta);
+            font-size: 7px;
+        }
+
         .toast {
             position: fixed;
             bottom: 20px;
@@ -560,7 +592,7 @@
                 <button onclick="getFollowers()">👥 FOLLOWERS</button>
                 <button onclick="getQuota()">📊 QUOTA</button>
                 <button onclick="showFlexBuilder()">✏️ FLEX BUILDER</button>
-                <button onclick="openInbox()">📥 INBOX</button>
+                <button onclick="openInbox()">📥 INBOX<span class="inbox-badge" id="inboxBadge"></span></button>
                 <button onclick="clearChat()">🗑️ CLEAR</button>
             </div>
         </div>
@@ -703,6 +735,94 @@
                 .replace(/'/g, '&#39;');
         }
 
+        // ---------------- แจ้งเตือนข้อความใหม่แบบพื้นหลัง (ทำงานตลอด ไม่ต้องเปิด INBOX ก่อน) ----------------
+        // เก็บ "เวลาข้อความล่าสุดที่อ่านแล้ว" ต่อ userId ไว้ใน localStorage เพื่อให้จำได้แม้รีเฟรชหน้า
+        const NOTIFY_STORAGE_KEY = 'lineBotMcp_lastSeenIn_v1';
+        let lastSeenIn = {};
+        try {
+            lastSeenIn = JSON.parse(localStorage.getItem(NOTIFY_STORAGE_KEY) || '{}');
+        } catch (e) {
+            lastSeenIn = {};
+        }
+        // กันแจ้งเตือน (toast/เสียง) ซ้ำสำหรับข้อความเดียวกันในรอบ poll ถัดๆ ไประหว่างที่ยังไม่ได้เปิดอ่าน
+        const notifiedKeys = new Set();
+
+        function saveLastSeenIn() {
+            try { localStorage.setItem(NOTIFY_STORAGE_KEY, JSON.stringify(lastSeenIn)); } catch (e) { /* no-op */ }
+        }
+
+        function isConversationUnread(c) {
+            if (c.lastDirection !== 'in') return false;
+            const seenTs = lastSeenIn[c.userId];
+            return !seenTs || new Date(c.lastTimestamp) > new Date(seenTs);
+        }
+
+        function markThreadAsRead(userId) {
+            lastSeenIn[userId] = new Date().toISOString();
+            saveLastSeenIn();
+            pollGlobalInbox(); // อัปเดต badge ทันที ไม่ต้องรอรอบถัดไป
+        }
+
+        function updateInboxBadge(count) {
+            const badge = document.getElementById('inboxBadge');
+            if (!badge) return;
+            if (count > 0) {
+                badge.textContent = count > 9 ? '9+' : String(count);
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function playNotifySound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'square';
+                o.frequency.value = 880;
+                g.gain.value = 0.05;
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                setTimeout(() => { o.stop(); ctx.close(); }, 150);
+            } catch (e) {
+                // บางเบราว์เซอร์บล็อกเสียงถ้ายังไม่มี user interaction ก่อนหน้านี้ในหน้านี้ ปล่อยผ่านได้
+            }
+        }
+
+        /**
+         * เช็คข้อความใหม่แบบพื้นหลัง ทำงานตลอดเวลาไม่ว่าจะเปิด modal ไหนอยู่หรือไม่
+         * ถ้าเจอข้อความ 'in' ที่ใหม่กว่าที่เคยอ่าน -> toast + เสียง + ขึ้น badge ที่ปุ่ม INBOX
+         */
+        async function pollGlobalInbox() {
+            try {
+                const data = await callGas('getConversations');
+                if (!data.success) return;
+                let unreadCount = 0;
+                data.conversations.forEach(c => {
+                    if (!isConversationUnread(c)) return;
+                    unreadCount++;
+                    const notifyKey = c.userId + '|' + c.lastTimestamp;
+                    if (!notifiedKeys.has(notifyKey)) {
+                        notifiedKeys.add(notifyKey);
+                        showToast(`💬 ข้อความใหม่จาก ${c.displayName}: ${(c.lastText || '').slice(0, 40)}`);
+                        playNotifySound();
+                    }
+                });
+                updateInboxBadge(unreadCount);
+                // ถ้า modal รายชื่อ inbox เปิดอยู่ รีเฟรชรายการให้ badge "ใหม่" ในลิสต์อัปเดตด้วย
+                if (document.getElementById('inboxListModal').classList.contains('show')) {
+                    refreshInboxList();
+                }
+            } catch (e) {
+                // เช็คพื้นหลังเงียบๆ ไม่ต้องโชว์ error รบกวน
+            }
+        }
+
+        setInterval(pollGlobalInbox, 6000);
+        pollGlobalInbox();
+
         // ---------------- Inbox ----------------
         let inboxPollInterval = null;
         let currentThreadUserId = null;
@@ -747,8 +867,9 @@
                 container.innerHTML = data.conversations.map(c => {
                     const avatar = c.pictureUrl || '';
                     const prefix = c.lastDirection === 'out' ? '↩ ' : '';
+                    const isUnread = isConversationUnread(c);
                     return `
-                        <div class="inbox-item"
+                        <div class="inbox-item ${isUnread ? 'unread' : ''}"
                              data-user-id="${escapeAttr(c.userId)}"
                              data-display-name="${escapeAttr(c.displayName)}"
                              data-avatar="${escapeAttr(avatar)}">
@@ -779,6 +900,8 @@
             document.getElementById('threadUserAvatar').src = pictureUrl || '';
             document.getElementById('inboxThreadModal').classList.add('show');
             await refreshThread();
+            // เปิดดูแล้ว = อ่านแล้ว จำเวลาปัจจุบันไว้กันแจ้งเตือนซ้ำ/เอาไอคอน "ใหม่" ออก
+            markThreadAsRead(userId);
             stopInboxPolling();
             inboxPollInterval = setInterval(refreshThread, 3000);
         }
