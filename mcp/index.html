@@ -440,7 +440,7 @@
 
     <script>
         // ★★★ ตั้งค่าตรงนี้: URL ของ GAS Web App ที่ Deploy แล้ว (ต้องลงท้ายด้วย /exec) ★★★
-        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxdXiV1F95c6d7uWz-3T7wqqiJK_EKjyMGHNyuJTv5umihRDz1Q0j7pPdnFcBUUCc0peA/exec';
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
@@ -535,7 +535,9 @@
                     const data = await callGas('askAI', { question: text, model });
                     removeTyping();
                     if (data.success) {
-                        addMessage(data.answer, 'ai', `🤖 ${data.model}`);
+                        const lineStatus = data.lineSent ? '📲 ส่งเข้า LINE แล้ว' : `⚠️ ไม่ได้ส่งเข้า LINE${data.lineError ? ' (' + data.lineError + ')' : ''}`;
+                        addMessage(data.answer, 'ai', `🤖 ${data.model} · ${lineStatus}`);
+                        showToast(data.lineSent ? '✅ ตอบแล้วและส่งเข้า LINE' : '⚠️ ตอบแล้ว แต่ส่ง LINE ไม่สำเร็จ', data.lineSent ? 'info' : 'error');
                     } else {
                         addMessage(`❌ ${data.error || 'เกิดข้อผิดพลาด'}`, 'received');
                         showToast('❌ AI ตอบไม่สำเร็จ', 'error');
