@@ -1168,7 +1168,9 @@
             try {
                 const data = await callGas('getAIProviders');
                 if (!data.success) {
-                    showToast('⚠️ โหลดรายชื่อโมเดล AI ไม่สำเร็จ', 'error');
+                    console.error('getAIProviders failed:', data.error);
+                    modelSelect.innerHTML = `<option value="">❌ โหลดไม่สำเร็จ: ${escapeHtml(data.error || 'unknown')}</option>`;
+                    showToast(`⚠️ โหลดรายชื่อโมเดล AI ไม่สำเร็จ: ${data.error || ''}`, 'error');
                     return;
                 }
                 const providers = data.providers;
@@ -1204,7 +1206,9 @@
                     modelSelect.appendChild(opt);
                 }
             } catch (e) {
-                showToast('⚠️ โหลดรายชื่อโมเดล AI ไม่สำเร็จ', 'error');
+                console.error('loadAiProviders exception:', e);
+                modelSelect.innerHTML = `<option value="">❌ เชื่อมต่อไม่ได้: ${escapeHtml(e.message || '')}</option>`;
+                showToast(`⚠️ เชื่อมต่อ GAS ไม่สำเร็จ: ${e.message || ''}`, 'error');
             }
         }
 
