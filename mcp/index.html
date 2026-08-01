@@ -1009,26 +1009,11 @@
                 <button id="sendBtn" onclick="sendMessage()">ส่ง</button>
             </div>
             <div class="tools-bar">
-                <button onclick="sendFlexMessage()">📊 FLEX</button>
-                <button onclick="broadcastMessage()">📢 BROADCAST</button>
                 <button onclick="getProfile()">👤 PROFILE</button>
                 <button onclick="getFollowers()">👥 FOLLOWERS</button>
                 <button onclick="getQuota()">📊 QUOTA</button>
-                <button onclick="showFlexBuilder()">✏️ FLEX BUILDER</button>
                 <button onclick="openInbox()">📥 INBOX<span class="inbox-badge" id="inboxBadge"></span></button>
                 <button onclick="clearChat()">🗑️ CLEAR</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Flex Builder Modal -->
-    <div class="modal-overlay" id="flexModal">
-        <div class="modal">
-            <h3>✏️ FLEX BUILDER</h3>
-            <textarea id="flexJsonInput" placeholder='{"type":"bubble","body":{"type":"box","layout":"vertical","contents":[{"type":"text","text":"Hello!"}]}}'></textarea>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="closeFlexBuilder()">ยกเลิก</button>
-                <button class="btn-primary" onclick="sendCustomFlex()">ส่ง Flex</button>
             </div>
         </div>
     </div>
@@ -1647,64 +1632,6 @@
             }
         }
 
-        async function broadcastMessage() {
-            const text = prompt('📢 ข้อความที่ต้องการ Broadcast:', 'Hello from MCP!');
-            if (!text) return;
-
-            addMessage(`📢 กำลัง Broadcast: "${text}"`, 'received');
-            addTyping();
-            try {
-                const data = await callGas('broadcast', { message: text });
-                removeTyping();
-                if (data.success) {
-                    addMessage('✅ Broadcast สำเร็จ!', 'received');
-                    showToast('✅ Broadcast สำเร็จ');
-                } else {
-                    addMessage(`❌ Error: ${data.error}`, 'received');
-                    showToast('❌ Broadcast ไม่สำเร็จ', 'error');
-                }
-            } catch (error) {
-                removeTyping();
-                addMessage(`❌ Error: ${error.message}`, 'received');
-                showToast('❌ Broadcast error', 'error');
-            }
-        }
-
-        async function sendFlexMessage() {
-            const sampleFlex = {
-                type: 'bubble',
-                body: {
-                    type: 'box',
-                    layout: 'vertical',
-                    contents: [
-                        { type: 'text', text: '🎉 Flex Message!', weight: 'bold', size: 'xl', color: '#06C755' },
-                        { type: 'text', text: 'ส่งจาก MCP Web Interface', size: 'sm', color: '#666666', margin: 'md' },
-                        { type: 'separator', margin: 'md' },
-                        { type: 'text', text: '✅ ทำงานสำเร็จ!', size: 'sm', color: '#333333', margin: 'md' }
-                    ]
-                },
-                styles: { footer: { separator: true } }
-            };
-
-            addMessage('📊 กำลังส่ง Flex Message...', 'received');
-            addTyping();
-            try {
-                const data = await callGas('sendFlex', { altText: 'Flex Message from MCP', contents: sampleFlex });
-                removeTyping();
-                if (data.success) {
-                    addMessage('✅ ส่ง Flex Message สำเร็จ!', 'received');
-                    showToast('✅ Flex message sent');
-                } else {
-                    addMessage(`❌ Error: ${data.error}`, 'received');
-                    showToast('❌ Flex send failed', 'error');
-                }
-            } catch (error) {
-                removeTyping();
-                addMessage(`❌ Error: ${error.message}`, 'received');
-                showToast('❌ Flex error', 'error');
-            }
-        }
-
         async function getQuota() {
             addMessage('📊 กำลังตรวจสอบ Quota...', 'received');
             addTyping();
@@ -1727,56 +1654,6 @@
                 removeTyping();
                 addMessage(`❌ Error: ${error.message}`, 'received');
                 showToast('❌ Quota error', 'error');
-            }
-        }
-
-        function showFlexBuilder() {
-            document.getElementById('flexModal').classList.add('show');
-            document.getElementById('flexJsonInput').value = JSON.stringify({
-                type: 'bubble',
-                body: {
-                    type: 'box',
-                    layout: 'vertical',
-                    contents: [
-                        { type: 'text', text: 'Hello!', weight: 'bold', size: 'xl' },
-                        { type: 'text', text: 'Flex message', size: 'sm', color: '#666666' }
-                    ]
-                }
-            }, null, 2);
-        }
-
-        function closeFlexBuilder() {
-            document.getElementById('flexModal').classList.remove('show');
-        }
-
-        async function sendCustomFlex() {
-            const jsonInput = document.getElementById('flexJsonInput');
-            let contents;
-            try {
-                contents = JSON.parse(jsonInput.value);
-            } catch (e) {
-                showToast('❌ JSON ไม่ถูกต้อง', 'error');
-                addMessage(`❌ JSON Error: ${e.message}`, 'received');
-                return;
-            }
-
-            closeFlexBuilder();
-            addMessage('📊 กำลังส่ง Flex Message...', 'received');
-            addTyping();
-            try {
-                const data = await callGas('sendFlex', { altText: 'Custom Flex Message', contents });
-                removeTyping();
-                if (data.success) {
-                    addMessage('✅ ส่ง Flex Message สำเร็จ!', 'received');
-                    showToast('✅ Custom flex sent');
-                } else {
-                    addMessage(`❌ Error: ${data.error}`, 'received');
-                    showToast('❌ Send failed', 'error');
-                }
-            } catch (error) {
-                removeTyping();
-                addMessage(`❌ Error: ${error.message}`, 'received');
-                showToast('❌ Send error', 'error');
             }
         }
 
