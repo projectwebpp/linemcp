@@ -571,6 +571,10 @@
             cursor: pointer;
         }
 
+        .pixel-select {
+            max-width: 200px;
+        }
+
         .pixel-toggle.on {
             background: var(--accent-magenta);
             color: #fff;
@@ -989,11 +993,12 @@
 
         <div class="controls-bar">
             <button class="pixel-toggle" id="aiModeBtn" onclick="toggleAiMode()">🤖 AI: OFF</button>
+            <!-- ★ แก้ไข: เดิม hardcode รายชื่อรุ่นเฉพาะ Gemini ไว้ตรงนี้ ทำให้เลือก OpenAI/Claude
+                 จากหน้าเว็บไม่ได้ และค่าที่ส่งไป backend ไม่มี "provider" กำกับเลย
+                 ตอนนี้เปลี่ยนเป็นโหลดรายชื่อ provider/model จริงจาก backend (action getAIProviders)
+                 มาสร้าง option แบบ dynamic แทน (ดูฟังก์ชัน loadAiProviders() ด้านล่าง) -->
             <select class="pixel-select" id="modelSelect">
-                <option value="gemini-3.6-flash">GEMINI 3.6 FLASH</option>
-                <option value="gemini-3.5-flash-lite">GEMINI 3.5 FLASH-LITE</option>
-                <option value="gemini-2.5-flash">GEMINI 2.5 FLASH</option>
-                <option value="gemini-2.5-pro">GEMINI 2.5 PRO</option>
+                <option value="">⏳ กำลังโหลดรายชื่อโมเดล...</option>
             </select>
         </div>
 
@@ -1151,6 +1156,69 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
+        }
+
+        /**
+         * ★ ใหม่: โหลดรายชื่อ provider/model จริงจาก backend (action 'getAIProviders')
+         * แล้วสร้าง <optgroup> ต่อ 1 provider เพื่อให้ dropdown ตรงกับ AI_PROVIDERS_ ใน Code.gs
+         * เสมอ (ไม่ต้อง hardcode ชื่อรุ่นซ้ำสองที่ซึ่งเป็นสาเหตุที่ทำให้ก่อนหน้านี้
+         * เลือก Gemini รุ่นที่ backend ไม่รู้จัก และเลือก OpenAI/Claude จากหน้าเว็บไม่ได้เลย)
+         */
+        async function loadAiProviders() {
+            try {
+                const data = await callGas('getAIProviders');
+                if (!data.success) {
+                    showToast('⚠️ โหลดรายชื่อโมเดล AI ไม่สำเร็จ', 'error');
+                    return;
+                }
+                const providers = data.providers;
+                const current = data.current || {};
+                modelSelect.innerHTML = '';
+
+                Object.keys(providers).forEach(providerKey => {
+                    const providerCfg = providers[providerKey];
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = providerCfg.label;
+                    providerCfg.models.forEach(m => {
+                        const opt = document.createElement('option');
+                        // ค่า option เก็บทั้ง provider และ model ไว้ด้วยกัน คั่นด้วย '::'
+                        // เพื่อให้ sendMessage()/suggestAiReply() ส่งทั้งสองค่าไป backend ตรงกันเสมอ
+                        opt.value = providerKey + '::' + m;
+                        opt.textContent = m;
+                        if (providerKey === current.provider && m === current.model) {
+                            opt.selected = true;
+                        }
+                        optgroup.appendChild(opt);
+                    });
+                    modelSelect.appendChild(optgroup);
+                });
+
+                // เผื่อกรณี current.model ถูกตั้งค่าเอง (เช่นพิมพ์ผ่านเมนู LINE เป็นชื่อรุ่นที่ไม่อยู่ในลิสต์)
+                // ให้เพิ่ม option พิเศษเพื่อไม่ให้ dropdown เลือกผิด provider ไปเงียบๆ
+                const hasSelected = Array.from(modelSelect.options).some(o => o.selected);
+                if (!hasSelected && current.provider && current.model) {
+                    const opt = document.createElement('option');
+                    opt.value = current.provider + '::' + current.model;
+                    opt.textContent = `${current.model} (กำหนดเอง)`;
+                    opt.selected = true;
+                    modelSelect.appendChild(opt);
+                }
+            } catch (e) {
+                showToast('⚠️ โหลดรายชื่อโมเดล AI ไม่สำเร็จ', 'error');
+            }
+        }
+
+        /**
+         * ★ ใหม่: แกะค่า provider/model จาก modelSelect.value (รูปแบบ "provider::model")
+         * เพื่อส่งทั้งสองค่านี้ไปกับทุก request ที่เรียก AI (askAI / suggestAI)
+         * ก่อนหน้านี้โค้ดส่งแค่ model เฉยๆ ทำให้ backend เอา provider ปัจจุบัน (ที่อาจถูกเปลี่ยน
+         * จากเมนู LINE เป็นคนละเจ้ากับที่หน้าเว็บเลือกไว้) มาจับคู่กับ model ผิดเจ้า แล้วเรียก AI พัง
+         */
+        function getSelectedProviderModel() {
+            const val = modelSelect.value || '';
+            const sep = val.indexOf('::');
+            if (sep === -1) return { provider: undefined, model: val || undefined };
+            return { provider: val.slice(0, sep), model: val.slice(sep + 2) };
         }
 
         // ---------------- แจ้งเตือนข้อความใหม่แบบพื้นหลัง (ทำงานตลอด ไม่ต้องเปิด INBOX ก่อน) ----------------
@@ -1415,8 +1483,9 @@
             const originalLabel = suggestBtn.textContent;
             suggestBtn.textContent = '🤖 กำลังคิด...';
             try {
-                const model = modelSelect.value;
-                const data = await callGas('suggestAI', { question, model });
+                // ★ แก้ไข: ส่งทั้ง provider และ model ที่แกะจาก dropdown แทนที่จะส่งแค่ model
+                const { provider, model } = getSelectedProviderModel();
+                const data = await callGas('suggestAI', { question, provider, model });
                 if (data.success) {
                     input.value = data.answer;
                     input.focus();
@@ -1479,11 +1548,14 @@
 
             if (aiMode) {
                 try {
-                    const model = modelSelect.value;
-                    const data = await callGas('askAI', { question: text, model });
+                    // ★ แก้ไข: ส่งทั้ง provider และ model ที่แกะจาก dropdown แทนที่จะส่งแค่ model
+                    // (เดิมส่งแค่ model เฉยๆ ทำให้ backend เอา provider ปัจจุบันของ Script Properties
+                    // มาจับคู่กับชื่อ model ที่หน้าเว็บส่งมา ถ้าคนละเจ้ากันจะเรียก AI พัง)
+                    const { provider, model } = getSelectedProviderModel();
+                    const data = await callGas('askAI', { question: text, provider, model });
                     removeTyping();
                     if (data.success) {
-                        addMessage(data.answer, 'ai', `🤖 ${data.model} · ${lineStatusLabel(data)}`);
+                        addMessage(data.answer, 'ai', `🤖 ${data.provider}/${data.model} · ${lineStatusLabel(data)}`);
                         showToast(data.lineSent ? '✅ ตอบแล้วและส่งเข้า LINE' : '⚠️ ตอบแล้ว แต่ส่ง LINE ไม่สำเร็จ', data.lineSent ? 'info' : 'error');
                     } else {
                         addMessage(`❌ ${data.error || 'เกิดข้อผิดพลาด'}`, 'received');
@@ -1729,9 +1801,10 @@
             }
         }
         checkStatus();
+        loadAiProviders(); // ★ ใหม่: โหลด dropdown provider/model จาก backend ตอนเปิดหน้า
         setInterval(checkStatus, 30000);
 
-        console.log('🕹️ LINE Bot MCP — pixel arcade edition ready with Mario background');
+        console.log('🕹️ LINE Bot MCP — pixel arcade edition ready with Mario background (provider/model sync fixed)');
     </script>
 </body>
 </html>
