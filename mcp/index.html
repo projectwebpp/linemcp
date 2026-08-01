@@ -1325,10 +1325,11 @@
         }
 
         async function refreshInboxList() {
+            const container = document.getElementById('inboxListContainer');
             try {
                 const data = await callGas('getConversations');
-                const container = document.getElementById('inboxListContainer');
                 if (!data.success) {
+                    console.error('getConversations failed:', data.error);
                     container.innerHTML = `<div class="inbox-empty">❌ ${escapeHtml(data.error || 'โหลดไม่สำเร็จ')}</div>`;
                     return;
                 }
@@ -1357,7 +1358,12 @@
                     `;
                 }).join('');
             } catch (e) {
-                // polling เงียบๆ ไม่ต้องรบกวนด้วย toast ทุกครั้ง
+                console.error('refreshInboxList exception:', e);
+                // ถ้ายังไม่เคยโหลดสำเร็จเลย (ยังค้างข้อความ "กำลังโหลด...") ให้โชว์ error แทน
+                // แต่ถ้าเคยโหลดรายการมาแล้ว (polling รอบถัดๆ ไปพัง) ไม่ต้องรบกวนด้วยการล้างของเดิมทิ้ง
+                if (container.innerHTML.includes('กำลังโหลด')) {
+                    container.innerHTML = `<div class="inbox-empty">❌ เชื่อมต่อไม่ได้: ${escapeHtml(e.message || '')}</div>`;
+                }
             }
         }
 
